@@ -86,7 +86,7 @@ def write_idx(path, recs):
         rec += b"\x00" * (16 - len(rec))
         bits = feats_to_bits(r["feats"])
         for w in range(nw):
-            rec += struct.pack("Q", (bits >> (64 * w)) & mask)
+            rec += struct.pack("Q", (bits >> (64 * (nw - 1 - w))) & mask)
         assert len(rec) == 16 + 8 * nw
         cod += rec
     cdat = "\n".join("%d\t%s" % (r["sid"], r["comment"].replace("\n", "%NL"))
@@ -124,7 +124,7 @@ def read_idx(path):
         bitmap = 0
         for w in range(in_n):
             word, = struct.unpack("Q", ch[16 + 8 * w:24 + 8 * w])
-            bitmap |= word << (64 * w)
+            bitmap |= word << (64 * (in_n - 1 - w))
         out.append(dict(sid=sid, pid=pid, start=st, end=en,
                         feats=bits_to_feats(bitmap, feats), role=rolemap.get(sid, "")))
     return out, feats

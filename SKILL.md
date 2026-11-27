@@ -177,16 +177,16 @@ python scripts/export_appraisal_stats.py --project ".../评价全书" --out . --
 | 人名首字母不切句 | `U. Khurelsukh` / `I.K. Azizov` 已在切句器里排除，否则一句话会被切成碎句 |
 | 复核件默认写到 cwd | 想放到项目里就加 `--out ./复核`，脚本会自动建目录 |
 
-## 已知问题（评价层）
+## 已验证的坑：位图字序
 
-**评价层的 `.idx` 在 UAM 6 里打不开**（2026-11-27）：打开含评价层的项目，UAM 报
-`Error: some problem with getData: list index out of range`。
+`.idx` 记录的位图按 64 位字存，**高位字在前**（`bits = word[0] << 64 | word[1]`）。
+写成低位字在前时 UAM 不报格式错，只在打开项目时抛
+`Error: some problem with getData: list index out of range` —— 它按错误偏移取位，下标越界。
 
-- 脚本侧全部通过：21 项自检 PASS、33 段回读特征完整、头部 `24+featLen+codLen+roleLen` 与文件长度自洽
-- 已排除：特征表顺序、字符集、层名、`.ct3`、切句、`role` 区（两个变体项目分别改字数与字序，仍报同一错）
-- 未定位：评价方案 75 个特征要 2 个 64 位字，而 `intsNeeded > 1` 的记录布局没有真实样本可对照——本机所有 UAM 生成的项目都是 1 个字（≤64 特征）
-- **及物性层不受影响**：36 特征 → 1 字 / 24 字节，字节与既往项目完全一致
-- 定位方法：用 UAM 自己新建一个带 Appraisal 层的项目、标一条、保存，再读它写的 `.idx` 对照字节
+- 1 个字的方案（及物性 36 特征）两种字序字节完全相同，所以这个坑只在 >64 特征的方案（评价 75 特征 → 2 字 / 32 字节记录）暴露
+- 定位方式：让 UAM 自己在评价层标 3 条并保存，读它的 `.idx` 对照，一眼看出 word[0] 全是 0、特征全在 word[1]
+- 修复：`uamlib.write_idx` / `read_idx` 按 `nw-1-w` 取字
+- 现状：修复后 UAM 能读出 33 段（Sharpie）与 15 段（Barron），`intsNeeded=2`、32 字节/条
 
 ## 参考
 
