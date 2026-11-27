@@ -20,7 +20,12 @@ import os, re, sys, html, struct, shutil, argparse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(os.path.dirname(HERE), 'assets')
-TEMPLATE_SCHEME = os.path.join(ASSETS, 'scheme-transitivity.xml')
+# 层名 => (方案模板, .ct3 里的层名)
+SCHEMES = {
+    'transitivity': ('scheme-transitivity.xml', '及物性'),
+    'appraisal': ('scheme-appraisal.xml', '评价'),
+}
+TEMPLATE_SCHEME = os.path.join(ASSETS, SCHEMES['transitivity'][0])
 ABBR = {'mr', 'mrs', 'ms', 'dr', 'st', 'jr', 'sr', 'prof', 'etc', 'e.g', 'i.e', 'vs', 'no'}
 
 
@@ -146,12 +151,12 @@ CT3 = """<?xml version='1.0' encoding='utf-8'?>
 
   <mediatype>text</mediatype>
   <layer version='3'>
-    <name>及物性</name>
+    <name>%(layer)s</name>
     <segtype>segment</segtype>
     <segmentation>none</segmentation>
     <autocode>None</autocode>
     <special>None</special>
-    <scheme>及物性.xml</scheme>
+    <scheme>%(scheme)s</scheme>
   </layer>
 </project>
 """
@@ -169,7 +174,10 @@ def main():
                     help='--text 时把视觉行（Word 导出的硬折行）还原成段落；一行一段的清洗稿不要加')
     ap.add_argument('--no-title', action='store_true',
                     help='丢掉开头标题/小标题行（新闻标题、编号，不属于正文）')
+    ap.add_argument('--scheme', choices=sorted(SCHEMES), default='transitivity',
+                    help='标注方案：transitivity（及物性，默认）或 appraisal（评价理论）')
     a = ap.parse_args()
+    scheme_file, layer = SCHEMES[a.scheme]
 
     if a.doc:
         import doc_to_html
@@ -195,8 +203,10 @@ def main():
     for sub in ['Corpus/Texts', 'Schemes', 'Annotations/Texts/Text-1.txt']:
         os.makedirs(os.path.join(out, sub), exist_ok=True)
     open(os.path.join(out, 'Corpus/Texts/Text-1.txt'), 'w', encoding='utf-8', newline='\n').write(text)
-    shutil.copy2(TEMPLATE_SCHEME, os.path.join(out, 'Schemes/及物性.xml'))
-    open(os.path.join(out, name + '.ct3'), 'w', encoding='utf-8', newline='\n').write(CT3)
+    shutil.copy2(os.path.join(ASSETS, scheme_file),
+                 os.path.join(out, 'Schemes/%s.xml' % layer))
+    open(os.path.join(out, name + '.ct3'), 'w', encoding='utf-8', newline='\n').write(
+        CT3 % dict(layer=layer, scheme=layer + '.xml'))
     open(os.path.join(out, 'Annotations/Texts/Text-1.txt/Metadata.idx'), 'wb').write(
         b'english\tutf-8\tArial\t14')
 
@@ -210,6 +220,7 @@ def main():
     print('%-10s 字符 %6d 段 %4d 句 %4d 词 %5d | 裸数字 %d 断词 %d 双空格 %d'
           % (name, len(text), len(paras), len(b), len(text.split()),
              len(nums), len(hy), len(re.findall(r'  ', text))))
+    print('  方案:', a.scheme, '→ Schemes/%s.xml（层名 %s）' % (layer, layer))
     print('  标题:', repr(paras[0][:60]))
     print('  首段:', repr(paras[1][:70]) if len(paras) > 1 else '')
     print('  末段:', repr(paras[-1][-70:]))

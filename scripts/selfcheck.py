@@ -41,6 +41,24 @@ CH2 = """The road was clear.
 They walked to the station.
 """
 
+# 评价理论：一段要落多个系统的特征（这是与及物性最大的结构差异）
+CH3 = """The film was utterly boring.
+Sadly, the children were disappointed by it.
+"""
+
+ANN3 = """ANN = {
+  0: [('utterly boring',
+       ['attitude', 'appreciation', 'reaction', 'quality',
+        'negative-attitude', 'inscribed'])],
+  1: [('Sadly',
+       ['attitude', 'affect', 'authorial-evaluation', 'un/happiness',
+        'misery/cheer', 'negative-attitude', 'inscribed']),
+      ('disappointed',
+       ['attitude', 'affect', 'non-authorial-evaluation', 'dis/satisfaction',
+        'dis/pleasure', 'negative-attitude', 'inscribed'])],
+}
+"""
+
 ANN1 = """ANN = {
  0: [('The snow fell all night', 'material',
       [('Actor', 'The snow'), ('location_time', 'all night')])],
@@ -120,6 +138,42 @@ def main():
             if not (os.path.exists(p) and os.path.getsize(p) > 0):
                 print('  ✗ 缺 %s' % f)
                 FAILS.append(f)
+
+        # ---- 评价理论层：多系统特征同一段 ----
+        write(os.path.join(tmp, 'ch3.txt'), CH3)
+        run('make_project.py', '--text', os.path.join(tmp, 'ch3.txt'),
+            '--out', os.path.join(b, '评价章'), '--name', '评价章',
+            '--scheme', 'appraisal', label='建项目 评价章')
+        write(os.path.join(b, '评价章', 'ap_a.py'), ANN3)
+        r = run('run_appraisal.py', '--project', os.path.join(b, '评价章'),
+                '--ann-prefix', 'ap', '--write',
+                '--out', os.path.join(tmp, '复核'), label='评价落盘')
+        idx3 = os.path.join(b, '评价章', 'Annotations/Texts/Text-1.txt/评价.idx')
+        if os.path.exists(idx3) and os.path.getsize(idx3) > 40:
+            print('  ✓ 评价章 评价.idx 已生成')
+        else:
+            print('  ✗ 评价章 评价.idx 缺失')
+            FAILS.append('评价 idx')
+        if '标注段 3' not in r.stdout:
+            print('  ✗ 评价章 段数不符（应为 3）')
+            FAILS.append('评价 段数')
+        try:
+            import uamlib, apprlib
+            sch = apprlib.Scheme(os.path.join(HERE, '..', 'assets',
+                                              'scheme-appraisal.xml'))
+            old = list(uamlib.FEATURES)
+            uamlib.set_features(sch.features)
+            back, ftab = uamlib.read_idx(idx3)
+            uamlib.set_features(old)
+            ok = (len(ftab) == len(sch.features)
+                  and all(len(x['feats']) >= 4 for x in back))
+            print('  %s 评价 idx 回读（%d 特征 / %d 段，多特征位图）'
+                  % ('✓' if ok else '✗', len(ftab), len(back)))
+            if not ok:
+                FAILS.append('评价 回读')
+        except Exception as ex:
+            print('  ✗ 评价 idx 回读失败: %s' % ex)
+            FAILS.append('评价 回读')
 
         print('\n%s' % ('PASS' if not FAILS else 'FAIL: ' + ', '.join(FAILS)))
         return 0 if not FAILS else 1

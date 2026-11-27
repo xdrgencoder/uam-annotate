@@ -22,6 +22,15 @@ FEATURES = [
 ]
 FSET = set(FEATURES)
 
+
+def set_features(feats):
+    """切换特征表（换方案用）。位图下标就是本表的顺序，写读必须成对：
+    set_features(方案特征) → write_idx / read_idx → set_features(旧表) 还原。"""
+    global FEATURES, FSET
+    FEATURES = list(feats)
+    FSET = set(FEATURES)
+    return FEATURES
+
 LABEL = {
     "location_time": "Location: Time", "location_place": "Location: Place",
     "manner": "Manner", "cause": "Cause", "accompaniment": "Accompaniment",

@@ -1,0 +1,624 @@
+<?xml version='1.0' encoding='utf-8'?>
+<NETWORK VERSION='1.1'>
+  <ROOT>
+    <FEATURE>
+      <NAME>appraisal</NAME>
+      <STATE>active</STATE>
+    </FEATURE>
+  </ROOT>
+  <SYSTEMS>
+    <SYSTEM>
+      <NAME>APPRAISAL-TYPE</NAME>
+      <EC>appraisal</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>attitude</NAME>
+          <STATE>active</STATE>
+          <GLOSS>ATTITUDE encompasses different options for expressing positive or
+negative evaluation</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>engagement</NAME>
+          <STATE>active</STATE>
+          <GLOSS>ENGAGEMENT addresses options for expanding and contracting space
+for other voices</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>graduation</NAME>
+          <STATE>active</STATE>
+          <GLOSS>adjustments of other meanings
+- scaling the FORCE of a meaning (e.g. intensifying or quantifying)
+- grading the FOCUS, (the boundedness) of the meaning
+(e.g. as degree of specificity or completion).</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>ATTITUDE-TYPE</NAME>
+      <EC>attitude</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>affect</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Evaluates an entity, process or state emotionally:
+E.g., that makes me happy.
+E.g., This building bores me.
+But note: A BORING building is APPRECIATION:REACTION
+E.g. Adverbs: happily, sadly
+Adjectives: I am  happy that
+Nominalised emotions: his fear...</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>judgement</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Evaluates human behaviour ethically (morally or legally)
+language which criticises or praises, which condemns or applauds
+the behaviour – the actions, deeds, sayings, beliefs, motivations etc
+- of human individuals and groups.</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>appreciation</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Evaluates things, processes and states of affairs aesthetically or wrt the social value accorded to the object.
+Human participants may be &apos;appreciated&apos; where the assessment does
+not directly focus on the correctness or incorrectness of behaviour, but rather the appearance of the person</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>AFFECT-TYPE</NAME>
+      <EC>affect</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>authorial-evaluation</NAME>
+          <STATE>active</STATE>
+          <GLOSS>The author is the one ascribing affect
+E.g., Sadly, ...</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>non-authorial-evaluation</NAME>
+          <STATE>active</STATE>
+          <GLOSS>A participant is the one evaluating the affect
+E.g.He likes Mary.</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>AFFECT-TYPE2</NAME>
+      <EC>affect</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>un/happiness</NAME>
+          <STATE>active</STATE>
+          <GLOSS>evaluates as two different types of happiness/unhappiness, i.e. negative and positive happiness. the first relates to the dimension misery(-ve) - cheer(+ve), the second relates to a dimension antipathy(-ve) - affection(+ve).</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>dis/satisfaction</NAME>
+          <STATE>active</STATE>
+          <GLOSS>evaluates via two sub-types of dis/satisfation, i.e. negative - positive satisfaction: the first is along the dimension ennui(-ve) - interest(+ve), the second displeasure - pleasure.</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>in/security</NAME>
+          <STATE>active</STATE>
+          <GLOSS>evaluates along two dimensions of -ve and +ve security: dis/quiet and dis/trust</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>dis/inclination</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments as to the desirability attached to any object, person or undertaking. e.g. keen, long for, wish to, versus wary, disinclined, unwanted</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>UN/HAPPINESS-TYPE</NAME>
+      <EC>un/happiness</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>misery/cheer</NAME>
+          <STATE>active</STATE>
+          <GLOSS>misery: e.g. down, sad, miserable (as behaviour: whimper, cry,wail) etc
+cheer: e.g. cheerful, buoyant, jubilant (as behaviour: chuckle, laugh, rejoice) etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>antipathy/affection</NAME>
+          <STATE>active</STATE>
+          <GLOSS>antipathy: e.g. dislike, hate, abhor (as behaviour: rubbish, abuse, revile) etc
+affection: e.g. fond, loving, adoring (as behaviour: shake hands, embrace, hug) etc</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>DIS/SATISFACTION-TYPE</NAME>
+      <EC>dis/satisfaction</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>ennui/interest</NAME>
+          <STATE>active</STATE>
+          <GLOSS>ennui: e.g. flat, stale, jaded (as behaviour: fidget, yawn, tune out)
+interest: e.g. involved, absorbed, engrossed (as behaviour: attentive, fixated, eyes glued)</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>dis/pleasure</NAME>
+          <STATE>active</STATE>
+          <GLOSS>displeasure: e.g.cross, angry, furious (caution, scold, castigate)
+pleasure: e.g. satisfied, pleased, chuffed (pat on the back, compliment, reward), etc</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>IN/SECURITY-TYPE</NAME>
+      <EC>in/security</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>dis/quiet</NAME>
+          <STATE>active</STATE>
+          <GLOSS>disquiet: e.g. uneasy, anxious, freaked out (restless, sweating, shaking)
+quiet: e.g. together, confident, assured, laid back, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>dis/trust</NAME>
+          <STATE>active</STATE>
+          <GLOSS>distrust: e.g. taken aback, astonished, suspicious
+trust: e.g. comfortable (with), assured, confident (in) (delegate, commit, entrust), etc</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>JUDGEMENT-TYPE</NAME>
+      <EC>judgement</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>normality</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments of how special or unusual is the behaviour or the person&apos;s state. e.g. natural, familiar, fashionable, celebrated, versus artificial, poseur, eccentric, peculiar, odd, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>capacity</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments of competence and ability, e.g. skilled, genius, knowledgeable, brilliant, versus stupid, dull, ignorant, clumsy, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>tenacity</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments of psychological disposition wrt determination and resolve. e.g. plucky, brave, resolute, reliable, loyal, hard-working, versus cowardly, reckless, hasty, impatient, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>propriety</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments of ethical or moral standing, &apos;how far beyond reproach&apos; si the behaviour or person&apos;s state. e.g. good, fair, just, generous, charitable, kind, versus immoral, corrupt, arrogant, greedy, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>veracity</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments regarding the person&apos;s truthfulness or honesty, dependent on social contextual values. e.g. credible, candid, direct, sincere, versus deceitful, a liar, manipulative, devious, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>unclear</NAME>
+          <STATE>active</STATE>
+          <GLOSS>assessments of behaviour and persona where none of the sub-types of judgement may apply. these cases are different than those which need to be double-coded under conditions of ambiguity.</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>APPRECIATION-TYPE</NAME>
+      <EC>appreciation</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>reaction</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Values which make reference to, or are derived from, values of AFFECT
+but where  the emotional reaction (depress, bore etc) has been detached
+from any human experiencer of the emotion and been attached to the
+evaluated entity as if it were some property which the entity objectively
+and intrinsically possesses
+E.g. A DEPRESSING sight met our eyes.
+E.g. It’s an extremely BORING building</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>composition</NAME>
+          <STATE>active</STATE>
+          <GLOSS>how well the parts of the entity fit together.
+POSITIVE: harmonious, well-formed, balanced, unified, intricate
+NEGATIVE: ill-formed, convoluted, confused, unbalanced, discordant,
+contorted.</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>social-valuation</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Whether somethng is &apos;socially&apos; valued for its usefulness, worthiness, efficaciousness, health-giving properties: its contribution to the community, or its value to the consumer: related to judgement: propriety</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>REACTION-TYPE</NAME>
+      <EC>reaction</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>impact</NAME>
+          <STATE>active</STATE>
+          <GLOSS>how does it strike me? what initial reaction does it make? the perceptual aspects or aesthetics of the item</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>quality</NAME>
+          <STATE>active</STATE>
+          <GLOSS>do i like it? how do i react emotionally towards it, what are my affectual responses</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>COMPOSITION-TYPE</NAME>
+      <EC>composition</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>balance</NAME>
+          <STATE>active</STATE>
+          <GLOSS>did it hang together? was it harmonious, organised, well-proportioned, logical, or unbalanced, lop-sided, irregular, flawed, discordant, shapeless?</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>complexity</NAME>
+          <STATE>active</STATE>
+          <GLOSS>was it hard or easy to follow? was it simple, pure, elegant, clear, precise, lucid, coherent, or was it extravagent, byzantine, woolly, arcane, simplistic, etc?</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>EXPLICITNESS</NAME>
+      <EC>attitude</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>inscribed</NAME>
+          <STATE>active</STATE>
+          <GLOSS>The text contains a word or phrase which explicitly
+evaluates the behaviour.
+E.g. immoral, virtuous, just, sinful, lascivious,</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>invoked</NAME>
+          <STATE>active</STATE>
+          <GLOSS>The judgement is not explicit in a word or phrase, but
+rather implied by information given.
+E.g. Bush delivered his inaugural speech as the United States President
+who collected 537,000 fewer votes than his opponent.</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>ATTITUDE-POLARITY</NAME>
+      <EC>attitude</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>positive-attitude</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>negative-attitude</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>ambiguous</NAME>
+          <STATE>active</STATE>
+          <GLOSS>&apos;ambiguous&apos; or unclear valency can be a feature of texts where an attitude is clearly present, but it is not clear whether it is negative or positive - such as in cases where this serves some rhetorical purpose, or where a reader may not be able to decide one way or the other, even after taking into account co-textual and cultural cues.</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>ENGAGEMENT-TYPE</NAME>
+      <EC>engagement</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>mono-glossic</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>hetero-glossic</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>HETERO-GLOSSIC-TYPE</NAME>
+      <EC>hetero-glossic</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>contract</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>expand</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>CONTRACT-TYPE</NAME>
+      <EC>contract</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>disclaim</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>proclaim</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>DISCLAIM-TYPE</NAME>
+      <EC>disclaim</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>deny</NAME>
+          <STATE>active</STATE>
+          <GLOSS>no, didn&apos;t, never, not, etc | disclaim: deny is a lexicogrammatical feature denying the scoped or framed entity or process, but its discourse semantic effects are multiple and depend on other co-textual signals</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>counter</NAME>
+          <STATE>active</STATE>
+          <GLOSS>counter covers all instances where contrast occurs for discourse semnatic reasons. it is usually signalled by lexical items such as yet, although, but, amazingly, etc, but it can be present through straight comparison-contrast such as via parallelism</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>PROCLAIM-TYPE</NAME>
+      <EC>proclaim</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>concur</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>pronounce</NAME>
+          <STATE>active</STATE>
+          <GLOSS>I contend, the facts of the matter are, indeed, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>endorse</NAME>
+          <STATE>active</STATE>
+          <GLOSS>the X demonstrates, shows, proves, ....</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>justify</NAME>
+          <STATE>active</STATE>
+          <GLOSS>a proposition is justified when reasons are given. signal words are because, since, the reason for, etc, and flags the proposition as contentious and requiring justification</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>CONCUR-TYPE</NAME>
+      <EC>concur</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>affirm</NAME>
+          <STATE>active</STATE>
+          <GLOSS>naturally, of course, obviously, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>concede</NAME>
+          <STATE>active</STATE>
+          <GLOSS>admittedly, sure..., however, etc</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>EXPAND-TYPE</NAME>
+      <EC>expand</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>entertain</NAME>
+          <STATE>active</STATE>
+          <GLOSS>perhaps, it&apos;s probably that, it seems, may, must, apparently, expository questions....</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>attribute</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>ATTRIBUTE-GATE</NAME>
+      <EC>attribute</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>acknowledge</NAME>
+          <STATE>active</STATE>
+          <GLOSS>halliday argues that, most people acknowledge that, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>distance</NAME>
+          <STATE>active</STATE>
+          <GLOSS>chomsky claimed to have shown that...</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>GRADUATION-TYPE</NAME>
+      <EC>graduation</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>force</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Stronger or weaker attitude</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>focus</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Exact or vague attitude
+Sharpening or softening of boundaries of:
+- entities (realising graded valeur), and
+- processes (realising graded fulfilment).
+Enable the blurring of categorical meanings
+(of entities or processes), representing them
+as open, fluidor incomplete.</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>FORCE-TYPE</NAME>
+      <EC>force</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>intensification</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Intensifies an attitude (SUCH A fool, EXTREMELY attractive)</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>quantification</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Quantifies the attitude
+- Number: heaps of troubles;
+- Amount: so much distress;
+- Extent: long-lasting hostility</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>INTENSIFICATION-TYPE</NAME>
+      <EC>intensification</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>degree</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>vigour</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>QUANTIFICATION-TYPE</NAME>
+      <EC>quantification</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>number</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>mass</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>extent</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>EXTENT-GATE</NAME>
+      <EC>extent</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>proximity</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>distribution</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>PROXIMITY-TYPE</NAME>
+      <EC>proximity</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>time</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>space</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>DISTRIBUTION-TYPE</NAME>
+      <EC>distribution</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>distrib-time</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>distrib-space</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>SCALE</NAME>
+      <EC>force</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>upscale</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>downscale</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>LEXICAL-FUSION</NAME>
+      <EC>force</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>isolating</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>infusing</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>FOCUS-TYPE</NAME>
+      <EC>focus</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>soften</NAME>
+          <STATE>active</STATE>
+          <GLOSS>E.g. it was sort of nice</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>sharpen</NAME>
+          <STATE>active</STATE>
+          <GLOSS>E.g. it was exactly what I wanted</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+  </SYSTEMS></NETWORK>

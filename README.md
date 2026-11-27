@@ -1,10 +1,10 @@
 # uam-transitivity
 
-**UAM CorpusTool 6 及物性标注流水线 —— 完全命令行，绕过 GUI。**
+**UAM CorpusTool 6 标注流水线 —— 完全命令行，绕过 GUI。**
 
-直接读写 CT6 的二进制 `.idx` 与 `sentence.dat`，用 Python 批量落盘。适用于英文叙事语料（单 text）的及物性分析，标注方案固定为 36 特征 / 5 系统 / 4 层。
+直接读写 CT6 的二进制 `.idx` 与 `sentence.dat`，用 Python 批量落盘。内置两套方案：**及物性**（36 特征 / 5 系统，小句标注）与**评价理论**（UAM 自带 Appraisal_max，75 特征 / 31 系统，态度·介入·级差）。
 
-An agent skill (WorkBuddy / Claude Code) for building, annotating, validating, merging and exporting UAM CorpusTool 6 transitivity projects without ever opening the GUI.
+An agent skill (WorkBuddy / Claude Code) for building, annotating, validating, merging and exporting UAM CorpusTool 6 projects without ever opening the GUI.
 
 ---
 
@@ -14,17 +14,31 @@ UAM CorpusTool 6 只提供 GUI：建项目靠点、标注靠点、多章合并�
 
 这个包把整条链路搬到命令行：项目结构、标注数据、合并、统计全部由脚本生成，产物可以直接用 UAM 打开核对，也可以完全不打开 UAM 就拿到 `StatsResult.html` 口径的频次表。
 
+## 两套方案
+
+| `--scheme` | 层名 | 方案 | 标注单位 | 标注脚本 |
+|---|---|---|---|---|
+| `transitivity`（默认） | 及物性 | 36 特征 / 5 系统 / 4 层 | 小句 + 成分，**一段一特征** | `run_annotation.py` |
+| `appraisal` | 评价 | 75 特征 / 31 系统 | 评价片段，**一段多特征**（每系统各一） | `run_appraisal.py` |
+
+评价方案来自 UAM 自带的 `Resources/Schemes/Appraisal_max.xml`，是 Martin & White 评价理论的标准实现：态度（affect / judgement / appreciation）、介入（mono·hetero-glossic → contract/expand）、级差（force / focus）。
+
+两套共用建项目、切句、二进制写法与复核件机制。差别在 `ANN` 结构与校验规则：
+
+- 及物性「一段一特征」，多个特征靠拆段实现
+- 评价「一段多特征」，一个跨度要同时落 `ATTITUDE-TYPE` + `EXPLICITNESS` + `ATTITUDE-POLARITY` 等系统，特征 OR 进同一张 u64 位图
+
 ## 五步流程
 
 | 步骤 | 脚本 | 作用 |
 |---|---|---|
-| 1. 建项目 | `make_project.py` | `.txt` / `.html` / `.doc` / `.docx` / `.rtf` / `.odt` → 标准 CT6 项目结构 |
-| 2. 写标注 | `ann_skeleton.py` + `run_annotation.py` | 生成骨架 → 填 `ANN` → 干跑 → 落盘（带备份） |
-| 3. 校验 | 内置于 `run_annotation.py` | 六项结构校验，非 0 即拒绝写盘 |
-| 4. 合并成书 | `merge_book.py` + `verify_merge.py` | 多章项目 → 一个 text；再切回逐章零差异比对 |
-| 5. 导出统计 | `export_stats.py` | 复刻 UAM 的 `StatsResult.html`，可加 `--xlsx` / `--csv` |
+| 1. 建项目 | `make_project.py` | `.txt` / `.html` / `.doc` / `.docx` / `.rtf` / `.odt` → 标准 CT6 项目结构；`--scheme` 选方案 |
+| 2. 写标注 | `ann_skeleton.py` + `run_annotation.py` / `run_appraisal.py` | 生成骨架 → 填 `ANN` → 干跑 → 落盘（带备份） |
+| 3. 校验 | 内置于标注脚本 | 及物性六项结构校验；评价层另加四条特征组合校验 |
+| 4. 合并成书 | `merge_book.py` + `verify_merge.py` | 多章项目 → 一个 text；再切回逐章零差异比对（及物性层） |
+| 5. 导出统计 | `export_stats.py` | 复刻 UAM 的 `StatsResult.html`，可加 `--xlsx` / `--csv`（及物性层） |
 
-配套：`doc_to_html.py`（Word/WPS → HTML，LibreOffice → pandoc → python-docx 三级降级）、`uamlib.py` / `annlib.py`（`.idx` 二进制读写与定位核心）、`selfcheck.py`（全链路自检）。
+配套：`doc_to_html.py`（Word/WPS → HTML，LibreOffice → pandoc → python-docx 三级降级）、`uamlib.py` / `annlib.py` / `apprlib.py`（`.idx` 二进制读写、定位核心、评价方案解析）、`selfcheck.py`（全链路自检）。
 
 ## 安装
 
@@ -71,6 +85,13 @@ python scripts/verify_merge.py --base ./项目 --book 全书 --chapters 第一�
 python scripts/export_stats.py --project "./项目/全书" --out . --xlsx
 ```
 
+评价理论方案：
+
+```bash
+python scripts/make_project.py --text 语料.txt --out ./项目/评价章 --name 评价章 --scheme appraisal
+python scripts/run_appraisal.py --project "./项目/评价章" --ann-prefix ap --write --out ./复核
+```
+
 ## 标注数据格式
 
 标注是纯数据文件，命名 `<prefix>_a.py`、`<prefix>_b.py`…，放在项目目录，每个导出 `ANN`：
@@ -91,6 +112,21 @@ ANN = {
 - 成分 = `(角色, 片段[, nth])`，`nth` 用于句内同片段多次出现
 - 片段按空白归一匹配（换行、多空格不影响），但必须与原文同字
 
+评价理论层换成特征列表，一段落多个系统的特征：
+
+```python
+ANN = {
+    0: [('utterly boring',
+         ['attitude', 'appreciation', 'reaction', 'quality',
+          'negative-attitude', 'inscribed'])],
+    1: [('Sadly',
+         ['attitude', 'affect', 'authorial-evaluation', 'un/happiness',
+          'misery/cheer', 'negative-attitude', 'inscribed'])],
+}
+```
+
+写盘前会校验**入口条件是否闭合**：选了 `quality` 就必须同时给 `reaction`、`appreciation`、`attitude`；`attitude` 一旦出现，极性（`ATTITUDE-POLARITY`）与显性度（`EXPLICITNESS`）也各要一个。完整 31 系统树见 `references/appraisal.md`。
+
 ## 关键事实（跳过会踩坑）
 
 | 事实 | 说明 |
@@ -99,15 +135,19 @@ ANN = {
 | `sid` / `pid` 是 u16 | 单 text 上限 65,535 条记录，超了必须先拆 |
 | 盒子标签只显示 `Clause` | 参与者/环境段必须写 `role` 字段，否则 UAM 只显示过程类型 |
 | 一句可有多条 `pid=0` | 并列、非限定、从属小句都平铺，不是错误 |
-| 每段只带一个特征 | 按成分分段，feature pattern 退化为单特征 |
+| 每段只带一个特征 | 及物性按成分分段，feature pattern 退化为单特征 |
+| 评价层一段多特征 | 一个跨度同时落多系统特征，OR 进同一张 u64 位图 |
+| 换方案要换特征表 | 位图下标 = 特征表顺序，`uamlib.set_features()` 写读成对、用完还原 |
 | `sentence.dat` 每句 8 字节 | 两个 uint32 起止；末句不推进 `start` 会重复末句 |
 | 顶层小句按顺序定位 | 前一小句的 `end` 是下一句的搜索 `start` |
 | 人名首字母不切句 | `U. Khurelsukh` / `I.K. Azizov` 已在切句器排除 |
-| 覆盖率 95–97% 正常 | 标题、独立呼语、句间空白本就不标 |
+| 覆盖率 95–97% 正常 | 及物性层；评价层天然只有 5–25%，低不是漏标 |
 
 ## 统计口径
 
-与 UAM 完全一致：**% = N ÷ 段总数，不是 system 内占比**。`MENTAL-TYPE` / `RELATIONAL-TYPE` 是 `PROCESS-TYPE` 的子集，不参与 100% 相加。详见 `references/statistics.md`。
+及物性层与 UAM 完全一致：**% = N ÷ 段总数，不是 system 内占比**。`MENTAL-TYPE` / `RELATIONAL-TYPE` 是 `PROCESS-TYPE` 的子集，不参与 100% 相加。详见 `references/statistics.md`。
+
+评价层的复核表按系统分组出频次与「占标注段」比例，不做 UAM 式 `StatsResult.html`。
 
 ## 自检
 
@@ -118,7 +158,7 @@ python scripts/selfcheck.py          # 跑完删临时目录
 python scripts/selfcheck.py --keep   # 保留产物以便查看
 ```
 
-会在临时目录把五步完整走一遍（建项目 → 骨架 → 标注落盘 → 合并 → 回比 → 统计），末尾打印 `PASS` 或失败项。
+会在临时目录把两条链路都走一遍（及物性：建项目 → 骨架 → 标注落盘 → 合并 → 回比 → 统计；评价：建项目 → 多特征标注落盘 → 位图回读），末尾打印 `PASS` 或失败项。
 
 ```
 selfcheck · Python 3.13.14
@@ -130,6 +170,10 @@ selfcheck · Python 3.13.14
   ✓ 合并全书
   ✓ 回比校验
   ✓ 统计导出
+  ✓ 建项目 评价章
+  ✓ 评价落盘
+  ✓ 评价章 评价.idx 已生成
+  ✓ 评价 idx 回读（76 特征 / 3 段，多特征位图）
 PASS
 ```
 
@@ -137,31 +181,36 @@ PASS
 
 ```
 uam-transitivity/
-├── SKILL.md                          # 技能说明（五步流程 + 关键事实）
+├── SKILL.md                          # 技能说明（方案对照 + 五步流程 + 关键事实）
 ├── scripts/
-│   ├── make_project.py               # 建项目
+│   ├── make_project.py               # 建项目（--scheme 选及物性/评价）
 │   ├── doc_to_html.py                # Word/WPS → HTML
-│   ├── ann_skeleton.py               # 生成 ANN 骨架
-│   ├── run_annotation.py             # 校验 + 落盘 + 复核件
+│   ├── ann_skeleton.py               # 生成 ANN 骨架（及物性）
+│   ├── run_annotation.py             # 及物性：校验 + 落盘 + 复核件
+│   ├── run_appraisal.py              # 评价：校验 + 落盘 + 复核件
 │   ├── merge_book.py                 # 多章合并
 │   ├── verify_merge.py               # 合并结果回比
 │   ├── export_stats.py               # 统计导出
-│   ├── uamlib.py                     # .idx / sentence.dat 读写
-│   ├── annlib.py                     # 片段定位与段落构建
-│   └── selfcheck.py                  # 全链路自检
+│   ├── uamlib.py                     # .idx / sentence.dat 读写 + 换特征表
+│   ├── annlib.py                     # 及物性：片段定位与段落构建
+│   ├── apprlib.py                    # 评价：方案解析、特征组合校验、位图落盘
+│   └── selfcheck.py                  # 全链路自检（两条链路）
 ├── references/
 │   ├── idx-format.md                 # 二进制格式细节
-│   ├── annotation-conventions.md     # 十条标注口径与争议判定
+│   ├── annotation-conventions.md     # 及物性十条标注口径与争议判定
+│   ├── appraisal.md                  # 评价 31 系统树、入口条件、四条校验、口径
 │   └── statistics.md                 # N / % 定义与三种视图
 └── assets/
-    └── scheme-transitivity.xml       # 及物性方案（36 特征 / 5 系统 / 4 层）
+    ├── scheme-transitivity.xml       # 及物性方案（36 特征 / 5 系统 / 4 层）
+    └── scheme-appraisal.xml          # 评价方案（75 特征 / 31 系统，UAM Appraisal_max）
 ```
 
 ## 不适用
 
 - UAM 的 UD 句法解析
 - 多 text 对照
-- 修改标注方案的特征集（方案是固定的）
+- 修改标注方案的特征集（方案按原样使用）
+- 评价层的多章合并与 `StatsResult.html` 统计（尚未实现）
 
 ## 许可
 
