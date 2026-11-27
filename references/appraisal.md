@@ -131,6 +131,7 @@ python scripts/export_appraisal_stats.py --project ./项目/评价全书 --out .
 
 ## 已知边界
 
+- **当前阻塞**：写入的 `.idx` 在 UAM 6 中打开会报 `some problem with getData: list index out of range`。脚本侧结构校验全过、回读特征完整，问题在 UAM 解析这一层，怀疑与「75 特征需要 2 个 64 位字」的记录布局有关（见 `idx-format.md` 的 `intsNeeded`）。在拿到 UAM 自己写的评价层 `.idx` 做对照之前，评价层的产物**只能用于统计与复核，不能直接进 UAM 阅读**。
 - 单 text 上限仍是 65,535 条记录（`sid` 是 u16）。评价层一段只写一条记录、又是稀疏标注，通常比及物性更难触顶。
 - 覆盖率天然偏低（5–25%），`run_appraisal.py` 不会因为覆盖率低而拦截。
 - `.idx` 的写法与已验证的及物性层同一个 writer（`uamlib.write_idx`），记录格式一致；但**首次用 UAM 打开评价项目时，建议看一眼盒子标签**——标签取「最深那条特征链」（如 `attitude·affect·un/happiness·misery/cheer`），存在 `role` 字段里，和及物性层同一套机制。
