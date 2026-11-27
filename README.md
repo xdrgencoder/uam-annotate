@@ -1,4 +1,4 @@
-# uam-transitivity
+# uam-annotate
 
 **UAM CorpusTool 6 标注流水线 —— 完全命令行，绕过 GUI。**
 
@@ -42,15 +42,17 @@ UAM CorpusTool 6 只提供 GUI：建项目靠点、标注靠点、多章合并�
 
 ## 安装
 
-把整个目录放进技能目录即可：
+直接克隆到技能目录：
 
 ```bash
 # WorkBuddy
-cp -r uam-transitivity ~/.workbuddy/skills/
+git clone https://github.com/xdrgencoder/uam-annotate.git ~/.workbuddy/skills/uam-annotate
 
 # Claude Code
-cp -r uam-transitivity ~/.claude/skills/
+git clone https://github.com/xdrgencoder/uam-annotate.git ~/.claude/skills/uam-annotate
 ```
+
+已经下载到本地的话，`cp -r uam-annotate ~/.workbuddy/skills/` 同样可以。
 
 也可以只当普通 Python 脚本用，直接 `python scripts/make_project.py --help`。
 
@@ -191,7 +193,7 @@ PASS
 ## 目录结构
 
 ```
-uam-transitivity/
+uam-annotate/
 ├── SKILL.md                          # 技能说明（方案对照 + 五步流程 + 关键事实）
 ├── scripts/
 │   ├── make_project.py               # 建项目（--scheme 选及物性/评价）

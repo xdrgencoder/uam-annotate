@@ -1,5 +1,5 @@
 ---
-name: uam-transitivity
+name: uam-annotate
 description: Build, annotate, validate, merge and export UAM CorpusTool 6 projects entirely from the command line, bypassing the GUI by writing the binary .idx format directly. Covers two schemes: transitivity (clause annotation) and appraisal (Martin & White attitude/engagement/graduation, multi-system features per span). Use when a task involves UAM / UAM CorpusTool / .ct3 / 及物性 / transitivity / 评价理论 / appraisal / attitude / engagement / graduation, clause annotation of English corpus texts, converting .doc or .txt chapters into UAM projects, merging chapter projects into one book text, or reproducing UAM's Statistics / StatsResult.html output. Triggered by 语料标注、及物性分析、过程类型、参与者角色、环境成分、评价标注、态度资源、介入、级差、UAM 项目、多章合并、统计导出.
 agent_created: true
 ---
