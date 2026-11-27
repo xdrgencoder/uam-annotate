@@ -112,8 +112,25 @@ python scripts/run_appraisal.py --project "./项目/评价章" --ann-prefix ap -
 - **`ambiguous`** 用于态度明显存在但正负难定，常见于有修辞目的的反讽。
 - `SCALE`（upscale / downscale）与 `LEXICAL-FUSION`（isolating / infusing）是 `force` 下两个**并列**系统，不是上下级。
 
+## 多章合并与统计
+
+两条命令都靠 `--layer` 切层，特征表按方案自动切换（写盘前会核对各章 idx 的特征表是否与方案一致，不一致直接拒绝合并，避免混方案拼位图）：
+
+```bash
+python scripts/merge_book.py --base ./项目 --chapters 第一章 第二章 --out 评价全书 --layer 评价
+python scripts/verify_merge.py --base ./项目 --book 评价全书 --chapters 第一章 第二章 --layer 评价
+python scripts/export_appraisal_stats.py --project ./项目/评价全书 --out . --xlsx --csv
+```
+
+`export_appraisal_stats.py` 与及物性的 `export_stats.py` 分工：
+
+- `export_stats.py` 认死及物性的 5 套系统（PROCESS-TYPE 三套的互斥/子集关系要特殊处理）
+- `export_appraisal_stats.py` 系统与特征**全部来自方案 xml**，31 个系统逐个出表，换方案不用改脚本；输出同样是 `StatsResult.html` 形状 + Excel 两页（Feature statistics / System summary）+ CSV
+
+口径与 UAM 一致：**N = 带该特征的段数，% = N ÷ 段总数（global）**，不是 system 内占比。所以同一个段会在多个系统里各计一次（一个 attitude 段同时进 APPRAISAL-TYPE、ATTITUDE-TYPE、EXPLICITNESS、ATTITUDE-POLARITY 四张表），这是正常的，不是重复计数——评价本来就是多维标注。
+
 ## 已知边界
 
-- `merge_book.py` / `verify_merge.py` / `export_stats.py` 目前只认及物性层（`及物性.idx` 与 PROCESS-TYPE 口径）。评价层的多章合并与 UAM 式 `StatsResult.html` 还没做；单章统计用复核表里的「统计」「系统覆盖」两张 sheet。
-- 覆盖率天然偏低，`run_appraisal.py` 不会因为覆盖率低而拦截。
+- 单 text 上限仍是 65,535 条记录（`sid` 是 u16）。评价层一段只写一条记录、又是稀疏标注，通常比及物性更难触顶。
+- 覆盖率天然偏低（5–25%），`run_appraisal.py` 不会因为覆盖率低而拦截。
 - `.idx` 的写法与已验证的及物性层同一个 writer（`uamlib.write_idx`），记录格式一致；但**首次用 UAM 打开评价项目时，建议看一眼盒子标签**——标签取「最深那条特征链」（如 `attitude·affect·un/happiness·misery/cheer`），存在 `role` 字段里，和及物性层同一套机制。

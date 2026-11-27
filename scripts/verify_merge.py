@@ -19,13 +19,15 @@ def main():
     ap.add_argument('--base', required=True)
     ap.add_argument('--book', required=True, help='合并后的项目目录名或绝对路径')
     ap.add_argument('--chapters', nargs='+', required=True)
+    ap.add_argument('--layer', default='及物性', help='层名（决定 idx 文件名，默认 及物性）')
     a = ap.parse_args()
+    idx_name = a.layer + '.idx'
 
     base = os.path.abspath(a.base)
     bk = a.book if os.path.isabs(a.book) else os.path.join(base, a.book)
     book = open(os.path.join(bk, 'Corpus/Texts/Text-1.txt'), encoding='utf-8').read()
     d = open(os.path.join(bk, 'Annotations/Texts/Text-1.txt/sentence.dat'), 'rb').read()
-    recs, _ = uamlib.read_idx(os.path.join(bk, 'Annotations/Texts/Text-1.txt/及物性.idx'))
+    recs, _ = uamlib.read_idx(os.path.join(bk, 'Annotations/Texts/Text-1.txt', idx_name))
 
     ok = True
     pos = base_rec = 0
@@ -36,7 +38,7 @@ def main():
             print('[文本] %s 不一致' % ch)
             ok = False
 
-        r0, _ = uamlib.read_idx(os.path.join(p, 'Annotations/Texts/Text-1.txt/及物性.idx'))
+        r0, _ = uamlib.read_idx(os.path.join(p, 'Annotations/Texts/Text-1.txt', idx_name))
         mine = [x for x in recs if pos <= x['start'] < pos + len(t)]
         # 章末补的换行会让最后一字符落在 seg 外，这里按 start 归属即可
         if len(mine) != len(r0):

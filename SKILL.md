@@ -23,11 +23,10 @@ agent_created: true
 
 - 把 `.doc` / `.txt` / 网页正文做成 UAM 项目并标注（及物性或评价）
 - 项目已有，要批量标注、校验、改写
-- 多章各自成项目后，合成本书一个 text（及物性层）
-- 要 UAM Statistics 口径的频次表（`StatsResult.html`、Excel、CSV）（及物性层）
+- 多章各自成项目后，合成本书一个 text（两条层都支持，`--layer` 切层）
+- 要 UAM Statistics 口径的频次表（`StatsResult.html`、Excel、CSV）
 
 不适用：需要 UAM 的 UD 句法解析、多 text 对照、或改标注方案特征集的场景。
-评价层的多章合并与 `StatsResult.html` 尚无实现，只有单章复核统计。
 
 ## 五步流程
 
@@ -129,27 +128,37 @@ python scripts/run_appraisal.py --project "./项目/评价章" --ann-prefix ap -
 ### 4. 合并成书
 
 ```bash
+# 及物性层
 python scripts/merge_book.py --base ./项目 \
   --chapters 斯日古冷 第二章 第三章 第四章 第五章 第六章 第七章 第八章 第九章 第十章 第十一章 第十二章 \
   --out 斯日古冷_全书
 python scripts/verify_merge.py --base ".../项目" --book 斯日古冷_全书 --chapters 斯日古冷 第二章 ...
+
+# 评价层（--layer 切层，特征表按方案自动换）
+python scripts/merge_book.py --base ./项目 --chapters 第一章 第二章 --out 评价全书 --layer 评价
+python scripts/verify_merge.py --base ./项目 --book 评价全书 --chapters 第一章 第二章 --layer 评价
 ```
 
 合并不是拼字符串：`sid` 加记录基数、`pid` 同步平移、`start/end` 加字符偏移。
-脚本自动校验「三系统之和 = 段总数」并逐条报越界/父段问题；`verify_merge.py` 再把书按章切回，
-与分章项目全字段比对，确认零差异。
+合并前核对各章 idx 的特征表与方案是否一致，不一致拒绝合并；及物性层还会校验「三系统之和 = 段总数」。
+`verify_merge.py` 再把书按章切回，与分章项目全字段比对，确认零差异。
 
 ### 5. 导出统计
 
 ```bash
+# 及物性层
 python scripts/export_stats.py --project ".../斯日古冷_全书" --out .
 python scripts/export_stats.py --project ".../全书" --out . --exclude 15599:31198 --suffix _dedup
 python scripts/export_stats.py --project ".../全书" --out . --xlsx --chapters 斯日古冷 第二章 ...
+
+# 评价层（系统与特征全部来自方案 xml，31 张表）
+python scripts/export_appraisal_stats.py --project ".../评价全书" --out . --xlsx --csv
 ```
 
-默认输出复刻 UAM 导出的 `StatsResult.html`（五张表 + `Counting: global`）。
+默认输出复刻 UAM 导出的 `StatsResult.html`（`Counting: global`）。
 口径与 UAM 完全一致：**% = N ÷ 段总数，不是 system 内占比**；MENTAL-TYPE / RELATIONAL-TYPE
 是 PROCESS-TYPE 的子集，不参与 100% 相加。详见 `references/statistics.md`。
+评价层同一段会在多个系统表里各计一次，这是多维标注的正常结果，不是重复计数。
 
 ## 关键事实（跳过会踩坑）
 
@@ -175,4 +184,4 @@ python scripts/export_stats.py --project ".../全书" --out . --xlsx --chapters 
 - `references/statistics.md` — UAM Statistics 的 N / % 定义与三种视图
 - `assets/scheme-transitivity.xml` — 及物性方案（36 特征 / 5 系统）
 - `assets/scheme-appraisal.xml` — 评价理论方案（UAM 自带 Appraisal_max，75 特征 / 31 系统）
-- `scripts/selfcheck.py` — 全链路自检（及物性 + 评价两条），末尾打印 PASS/FAIL
+- `scripts/selfcheck.py` — 全链路自检（及物性 + 评价两条，21 项），末尾打印 PASS/FAIL

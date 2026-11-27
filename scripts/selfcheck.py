@@ -59,6 +59,18 @@ ANN3 = """ANN = {
 }
 """
 
+CH4 = """What a marvellous performance it was.
+Perhaps the critics will disagree.
+"""
+
+ANN4 = """ANN = {
+  0: [('marvellous',
+       ['attitude', 'appreciation', 'reaction', 'quality',
+        'positive-attitude', 'inscribed'])],
+  1: [('Perhaps', ['engagement', 'hetero-glossic', 'expand', 'entertain'])],
+}
+"""
+
 ANN1 = """ANN = {
  0: [('The snow fell all night', 'material',
       [('Actor', 'The snow'), ('location_time', 'all night')])],
@@ -174,6 +186,30 @@ def main():
         except Exception as ex:
             print('  ✗ 评价 idx 回读失败: %s' % ex)
             FAILS.append('评价 回读')
+
+        # ---- 评价层第二段 + 合并 + 回比 + 统计 ----
+        write(os.path.join(tmp, 'ch4.txt'), CH4)
+        run('make_project.py', '--text', os.path.join(tmp, 'ch4.txt'),
+            '--out', os.path.join(b, '评价章2'), '--name', '评价章2',
+            '--scheme', 'appraisal', label='建项目 评价章2')
+        write(os.path.join(b, '评价章2', 'ap_a.py'), ANN4)
+        run('run_appraisal.py', '--project', os.path.join(b, '评价章2'),
+            '--ann-prefix', 'ap', '--write', '--no-export', label='评价章2 落盘')
+
+        run('merge_book.py', '--base', b, '--chapters', '评价章', '评价章2',
+            '--out', '评价全书', '--layer', '评价', label='合并评价全书')
+        r = run('verify_merge.py', '--base', b, '--book', '评价全书',
+                '--chapters', '评价章', '评价章2', '--layer', '评价', label='评价回比')
+        if '全部一致' not in r.stdout:
+            print('  ✗ 评价 verify_merge 未报「全部一致」')
+            FAILS.append('评价 verify')
+        run('export_appraisal_stats.py', '--project', os.path.join(b, '评价全书'),
+            '--out', os.path.join(tmp, '统计'), '--xlsx', '--csv', label='评价统计导出')
+        for f in ('StatsResult.html', 'StatsResult.xlsx'):
+            p = os.path.join(tmp, '统计', f)
+            if not (os.path.exists(p) and os.path.getsize(p) > 0):
+                print('  ✗ 缺 %s（评价）' % f)
+                FAILS.append('评价 ' + f)
 
         print('\n%s' % ('PASS' if not FAILS else 'FAIL: ' + ', '.join(FAILS)))
         return 0 if not FAILS else 1

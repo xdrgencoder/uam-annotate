@@ -53,11 +53,14 @@ def feats_to_bits(feats):
     return b
 
 
-def bits_to_feats(bits):
+def bits_to_feats(bits, table=None):
+    """table 缺省用模块级 FEATURES；读盘时一律传文件自带的特征表，
+    这样换方案（及物性/评价）互读不会错位。"""
+    t = FEATURES if table is None else table
     out, i = [], 0
     while bits:
         if bits & 1:
-            out.append(FEATURES[i])
+            out.append(t[i])
         bits >>= 1
         i += 1
     return out
@@ -109,7 +112,7 @@ def read_idx(path):
         sid, pid, st, en, flags = struct.unpack("2H2IB", ch[:13])
         bitmap, = struct.unpack("Q", ch[16:24])
         out.append(dict(sid=sid, pid=pid, start=st, end=en,
-                        feats=bits_to_feats(bitmap), role=rolemap.get(sid, "")))
+                        feats=bits_to_feats(bitmap, feats), role=rolemap.get(sid, "")))
     return out, feats
 
 

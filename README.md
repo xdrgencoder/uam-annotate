@@ -35,8 +35,8 @@ UAM CorpusTool 6 只提供 GUI：建项目靠点、标注靠点、多章合并�
 | 1. 建项目 | `make_project.py` | `.txt` / `.html` / `.doc` / `.docx` / `.rtf` / `.odt` → 标准 CT6 项目结构；`--scheme` 选方案 |
 | 2. 写标注 | `ann_skeleton.py` + `run_annotation.py` / `run_appraisal.py` | 生成骨架 → 填 `ANN` → 干跑 → 落盘（带备份） |
 | 3. 校验 | 内置于标注脚本 | 及物性六项结构校验；评价层另加四条特征组合校验 |
-| 4. 合并成书 | `merge_book.py` + `verify_merge.py` | 多章项目 → 一个 text；再切回逐章零差异比对（及物性层） |
-| 5. 导出统计 | `export_stats.py` | 复刻 UAM 的 `StatsResult.html`，可加 `--xlsx` / `--csv`（及物性层） |
+| 4. 合并成书 | `merge_book.py` + `verify_merge.py` | 多章项目 → 一个 text；再切回逐章零差异比对（`--layer` 切层） |
+| 5. 导出统计 | `export_stats.py` / `export_appraisal_stats.py` | 复刻 UAM 的 `StatsResult.html`，可加 `--xlsx` / `--csv` |
 
 配套：`doc_to_html.py`（Word/WPS → HTML，LibreOffice → pandoc → python-docx 三级降级）、`uamlib.py` / `annlib.py` / `apprlib.py`（`.idx` 二进制读写、定位核心、评价方案解析）、`selfcheck.py`（全链路自检）。
 
@@ -88,8 +88,16 @@ python scripts/export_stats.py --project "./项目/全书" --out . --xlsx
 评价理论方案：
 
 ```bash
+# 建项目 → 标注
 python scripts/make_project.py --text 语料.txt --out ./项目/评价章 --name 评价章 --scheme appraisal
 python scripts/run_appraisal.py --project "./项目/评价章" --ann-prefix ap --write --out ./复核
+
+# 多章合并（--layer 切层）
+python scripts/merge_book.py --base ./项目 --chapters 第一章 第二章 --out 评价全书 --layer 评价
+python scripts/verify_merge.py --base ./项目 --book 评价全书 --chapters 第一章 第二章 --layer 评价
+
+# 统计（31 张表，系统来自方案 xml）
+python scripts/export_appraisal_stats.py --project "./项目/评价全书" --out . --xlsx --csv
 ```
 
 ## 标注数据格式
@@ -158,7 +166,7 @@ python scripts/selfcheck.py          # 跑完删临时目录
 python scripts/selfcheck.py --keep   # 保留产物以便查看
 ```
 
-会在临时目录把两条链路都走一遍（及物性：建项目 → 骨架 → 标注落盘 → 合并 → 回比 → 统计；评价：建项目 → 多特征标注落盘 → 位图回读），末尾打印 `PASS` 或失败项。
+会在临时目录把两条链路都走一遍（及物性：建项目 → 骨架 → 标注落盘 → 合并 → 回比 → 统计；评价：建项目 → 多特征标注落盘 → 位图回读 → 合并 → 回比 → 统计），末尾打印 `PASS` 或失败项，共 21 项。
 
 ```
 selfcheck · Python 3.13.14
@@ -170,10 +178,13 @@ selfcheck · Python 3.13.14
   ✓ 合并全书
   ✓ 回比校验
   ✓ 统计导出
-  ✓ 建项目 评价章
-  ✓ 评价落盘
+  ✓ 建项目 评价章 / 评价章2
+  ✓ 评价落盘 / 评价章2 落盘
   ✓ 评价章 评价.idx 已生成
   ✓ 评价 idx 回读（76 特征 / 3 段，多特征位图）
+  ✓ 合并评价全书
+  ✓ 评价回比
+  ✓ 评价统计导出
 PASS
 ```
 
@@ -188,9 +199,10 @@ uam-transitivity/
 │   ├── ann_skeleton.py               # 生成 ANN 骨架（及物性）
 │   ├── run_annotation.py             # 及物性：校验 + 落盘 + 复核件
 │   ├── run_appraisal.py              # 评价：校验 + 落盘 + 复核件
-│   ├── merge_book.py                 # 多章合并
-│   ├── verify_merge.py               # 合并结果回比
-│   ├── export_stats.py               # 统计导出
+│   ├── merge_book.py                 # 多章合并（--layer 切层）
+│   ├── verify_merge.py               # 合并结果回比（--layer 切层）
+│   ├── export_stats.py               # 统计导出（及物性 5 套系统）
+│   ├── export_appraisal_stats.py     # 统计导出（方案驱动，评价 31 系统）
 │   ├── uamlib.py                     # .idx / sentence.dat 读写 + 换特征表
 │   ├── annlib.py                     # 及物性：片段定位与段落构建
 │   ├── apprlib.py                    # 评价：方案解析、特征组合校验、位图落盘
@@ -210,7 +222,6 @@ uam-transitivity/
 - UAM 的 UD 句法解析
 - 多 text 对照
 - 修改标注方案的特征集（方案按原样使用）
-- 评价层的多章合并与 `StatsResult.html` 统计（尚未实现）
 
 ## 许可
 
