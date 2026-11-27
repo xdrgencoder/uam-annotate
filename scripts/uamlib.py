@@ -66,8 +66,17 @@ def bits_to_feats(bits, table=None):
     return out
 
 
+def words_needed(feats=None):
+    """位图要几个 64 位字：头的第一个字段 intsNeeded。
+    及物性 36 特征 = 1 字（记录 24 字节）；评价 75 特征 = 2 字（记录 32 字节）。"""
+    n = len(FEATURES if feats is None else feats)
+    return max(1, (n + 63) // 64)
+
+
 def write_idx(path, recs):
     fb = ";".join(FEATURES).encode("utf-8")
+    nw = words_needed()
+    mask = (1 << 64) - 1
     cod = b""
     for r in recs:
         flags = 4
@@ -75,15 +84,17 @@ def write_idx(path, recs):
             flags |= 1
         rec = struct.pack("2H2IB", r["sid"], r["pid"], r["start"], r["end"], flags)
         rec += b"\x00" * (16 - len(rec))
-        rec += struct.pack("Q", feats_to_bits(r["feats"]))
-        assert len(rec) == 24
+        bits = feats_to_bits(r["feats"])
+        for w in range(nw):
+            rec += struct.pack("Q", (bits >> (64 * w)) & mask)
+        assert len(rec) == 16 + 8 * nw
         cod += rec
     cdat = "\n".join("%d\t%s" % (r["sid"], r["comment"].replace("\n", "%NL"))
                      for r in recs if r.get("comment")).encode("utf-8")
     rdat = "\n".join("%d\t%s" % (r["sid"], r["role"])
                      for r in recs if r.get("role")).encode("utf-8")
     with open(path, "wb") as f:
-        f.write(struct.pack("6I", 1, len(fb), len(cod), 0, len(rdat), len(cdat)))
+        f.write(struct.pack("6I", nw, len(fb), len(cod), 0, len(rdat), len(cdat)))
         f.write(fb); f.write(cod)
         if rdat:
             f.write(rdat)
@@ -110,7 +121,10 @@ def read_idx(path):
     for i in range(cl // rl_):
         ch = cod[i * rl_:(i + 1) * rl_]
         sid, pid, st, en, flags = struct.unpack("2H2IB", ch[:13])
-        bitmap, = struct.unpack("Q", ch[16:24])
+        bitmap = 0
+        for w in range(in_n):
+            word, = struct.unpack("Q", ch[16 + 8 * w:24 + 8 * w])
+            bitmap |= word << (64 * w)
         out.append(dict(sid=sid, pid=pid, start=st, end=en,
                         feats=bits_to_feats(bitmap, feats), role=rolemap.get(sid, "")))
     return out, feats

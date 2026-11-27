@@ -171,6 +171,7 @@ python scripts/export_appraisal_stats.py --project ".../评价全书" --out . --
 | 每段只带一个特征 | 及物性按成分分段（过程段/参与者段/环境段），故 feature pattern 退化为单特征 |
 | 评价层一段多特征 | 评价理论一个跨度同时落 ATTITUDE-TYPE / EXPLICITNESS / ATTITUDE-POLARITY… 每系统一特征，OR 进同一张位图 |
 | 换方案的位图会错乱 | 位图下标就是特征表顺序，`uamlib.set_features()` 必须在写/读时成对切换，写完立刻还原 |
+| 位图不是固定 8 字节 | 按 64 位字存，头的 `intsNeeded = ceil(特征数/64)`：及物性 36 特征 → 1 字/24 字节，评价 75 特征 → 2 字/32 字节 |
 | `sentence.dat` 每句 8 字节 | 两个 uint32 起止；切句器若末句不推进 `start` 会重复末句，务必校验 |
 | 顶层小句按顺序定位 | 前一小句的 `end` 就是下一句搜索的 `start`；母句跨度若吞掉后随非限定小句，后一句就报「未找到」 |
 | 人名首字母不切句 | `U. Khurelsukh` / `I.K. Azizov` 已在切句器里排除，否则一句话会被切成碎句 |

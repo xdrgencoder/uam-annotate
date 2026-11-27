@@ -53,9 +53,9 @@ struct Header { uint32 intsNeeded; uint32 featLen; uint32 codLen;
                 uint32 fieldLen;  uint32 roleLen;  uint32 commentLen; };
 ```
 
-- `intsNeeded` — 位图需要几个 64 位整数；36 个特征 → 1
+- `intsNeeded` — 位图需要几个 64 位字：`ceil(特征数 / 64)`。36 个特征 → 1；评价方案 75 个特征 → **2**
 - `featLen` — 特征表字节长度
-- `codLen` — 记录区字节长度（= 记录数 × 24）
+- `codLen` — 记录区字节长度（= 记录数 × `(16 + 8 × intsNeeded)`）
 - `fieldLen` — 恒为 0
 - `roleLen` / `commentLen` — 角色区 / 注释区字节长度，0 表示没有
 
@@ -69,7 +69,7 @@ clause;material;mental;relational;verbal;behavioural;existential;perception;emot
 
 **这个顺序必须与 `Schemes/及物性.xml` 的声明顺序一致**，否则 UAM 打开会错位。
 
-### 记录区（每条 24 字节）
+### 记录区（每条 `16 + 8 × intsNeeded` 字节）
 
 ```c
 struct Coding {
@@ -79,12 +79,17 @@ struct Coding {
   uint32 end;
   uint8  flags;    // bit0 = 有 comment，bit1 常置 1
   uint8  pad[3];
-  uint64 bitmap;   // 特征位图，bit i ↔ 特征表第 i 项
+  uint64 bitmap[intsNeeded];   // 特征位图，小端按字拼接：bit i ↔ 特征表第 i 项
 };
 ```
 
-写入时必须先把前 13 字节 pack 出来、补 3 字节到 16，再接 8 字节位图——
+写入时必须先把前 13 字节 pack 出来、补 3 字节到 16，再接 `8 × intsNeeded` 字节位图——
 `struct.pack('2H2IB', ...)` 天然只产生 13 字节，直接补 `b'\x00'*3` 即可。
+
+**位图不是固定 8 字节**：特征数 ≤ 64 时 1 个字（记录 24 字节，及物性），
+> 64 时按 64 位字往后接（评价 75 特征 → 2 个字，记录 32 字节）。
+拼位时第 k 个字存 `bits >> (64*k)` 的低 64 位，读回时左移 `64*k` 再或起来，即得完整大整数。
+只按 8 字节写、或只按 8 字节读，遇到 >64 特征的方案会直接溢出/截断。
 
 `pid` 指向父段，构成树：句子级小句（pid=0）→ 参与者/环境段（pid=小句 sid）→ 嵌套子句（pid=成分 sid）→ …
 
