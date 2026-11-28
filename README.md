@@ -6,6 +6,30 @@
 
 An agent skill (WorkBuddy / Claude Code) for building, annotating, validating, merging and exporting UAM CorpusTool 6 projects without ever opening the GUI.
 
+## 安装
+
+这是一个**给 AI 智能体用的 skill**，不是 pip 包。装法只有一步：把仓库克隆进技能目录。对任何 Agent 都可以这样说：
+
+> 克隆 https://github.com/xdrgencoder/uam-annotate 到你的技能目录
+
+各端默认位置：
+
+| 端 | 技能目录 |
+|---|---|
+| WorkBuddy | `~/.workbuddy/skills/uam-annotate` |
+| Claude Code | `~/.claude/skills/uam-annotate` |
+
+```bash
+git clone https://github.com/xdrgencoder/uam-annotate.git ~/.workbuddy/skills/uam-annotate   # WorkBuddy
+git clone https://github.com/xdrgencoder/uam-annotate.git ~/.claude/skills/uam-annotate      # Claude Code
+```
+
+已下载到本地的话，`cp -r uam-annotate ~/.workbuddy/skills/` 同样可以。
+
+**装完要新开一轮对话**才会被加载——技能是启动时扫描的，当场不生效不代表没装上。
+
+不想当 skill 用也行：`python scripts/make_project.py --help`，直接当普通脚本跑。
+
 ---
 
 ## 为什么需要它
@@ -42,23 +66,7 @@ UAM CorpusTool 6 只提供 GUI：建项目靠点、标注靠点、多章合并�
 
 配套：`doc_to_html.py`（Word/WPS → HTML，LibreOffice → pandoc → python-docx 三级降级）、`uamlib.py` / `annlib.py` / `apprlib.py`（`.idx` 二进制读写、定位核心、评价方案解析）、`selfcheck.py`（全链路自检）。
 
-## 安装
-
-直接克隆到技能目录：
-
-```bash
-# WorkBuddy
-git clone https://github.com/xdrgencoder/uam-annotate.git ~/.workbuddy/skills/uam-annotate
-
-# Claude Code
-git clone https://github.com/xdrgencoder/uam-annotate.git ~/.claude/skills/uam-annotate
-```
-
-已经下载到本地的话，`cp -r uam-annotate ~/.workbuddy/skills/` 同样可以。
-
-也可以只当普通 Python 脚本用，直接 `python scripts/make_project.py --help`。
-
-### 依赖
+## 依赖
 
 - Python 3.8+（开发与验证环境：3.13.14）
 - `openpyxl`（仅 `--xlsx` 导出与复核表需要）
