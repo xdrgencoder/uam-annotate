@@ -1,16 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""从纯文本或 HTML 建一个 UAM CorpusTool 6 项目骨架（及物性层 + 切句）
+"""从纯文本或 HTML 建一个 UAM CorpusTool 6 项目骨架（可多层 + 切句）
 
-    python make_project.py --text "第三章.txt" --out "C:/.../斯日古冷UAM项目/第三章" --name 第三章
-    python make_project.py --html "第三章.html" --out ".../第三章" --name 第三章
+    # 默认建四层：及物性 / 态度 / 介入 / 级差
+    python make_project.py --text "第三章.txt" --out "C:/.../项目/第三章" --name 第三章
+
+    # 只建一层（旧用法）
+    python make_project.py --text "第三章.txt" --out ".../第三章" --scheme transitivity
+    python make_project.py --text "第三章.txt" --out ".../第三章" --scheme appraisal
+
+    # 自选组合：--layer 层名:方案，可重复；只给层名时方案按名推断
+    python make_project.py --text "第三章.txt" --out ".../第三章" \
+        --layer 及物性:transitivity --layer 态度 --layer 介入
 
 产出：
     Corpus/Texts/Text-1.txt              正文（每段一行）
-    Schemes/及物性.xml                    标注方案（从 assets/ 复制）
-    <name>.ct3                            项目描述
+    Schemes/<层名>.xml                    每层一份标注方案（从 assets/ 复制）
+    <name>.ct3                            项目描述，内含多个 <layer>
     Annotations/Texts/Text-1.txt/Metadata.idx
+    Annotations/Texts/Text-1.txt/<层名>.idx      空 idx（0 条记录，特征表与方案一致）
     Annotations/Texts/Text-1.txt/sentence.dat   每句 8 字节（起、止）
+
+一个项目 = 一段语料 + 多层，共用同一份 Text-1.txt 与 sentence.dat；
+在 UAM 的 Layer 面板里切层查看，各层独立标注、独立统计。
 
 --html 适合 WPS/Word 导出的正文，会做视觉行→段落的还原；
 --doc 直接吃 .doc/.docx/.rtf/.odt（内部调 doc_to_html.py，需 LibreOffice 或 pandoc）；
@@ -19,13 +31,10 @@
 import os, re, sys, html, struct, shutil, argparse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ASSETS = os.path.join(os.path.dirname(HERE), 'assets')
-# 层名 => (方案模板, .ct3 里的层名)
-SCHEMES = {
-    'transitivity': ('scheme-transitivity.xml', '及物性'),
-    'appraisal': ('scheme-appraisal.xml', '评价'),
-}
-TEMPLATE_SCHEME = os.path.join(ASSETS, SCHEMES['transitivity'][0])
+sys.path.insert(0, HERE)
+import apprlib                     # 方案表 + 空 idx 用的特征表
+import uamlib
+ASSETS = apprlib.ASSETS
 ABBR = {'mr', 'mrs', 'ms', 'dr', 'st', 'jr', 'sr', 'prof', 'etc', 'e.g', 'i.e', 'vs', 'no'}
 
 
@@ -63,7 +72,7 @@ def build_paragraphs(lines):
         if not cur:
             cur = ln
             continue
-        prev_end = cur.rstrip().endswith(('.', '!', '?', '.”', '…', '."', '!”'))
+        prev_end = cur.rstrip().endswith(('.', '!', '?', '.”', '…', '."', '!"'))
         starts = bool(re.match(r'^[A-Z“"‘’\'\-—]', ln))
         if prev_end and starts:
             paras.append(cur)
@@ -145,12 +154,7 @@ def split_sentences(text):
     return [(s, e) for s, e in bounds if text[s:e].strip()]
 
 
-CT3 = """<?xml version='1.0' encoding='utf-8'?>
-<project>
-  <ctversion>5.0</ctversion>
-
-  <mediatype>text</mediatype>
-  <layer version='3'>
+CT3_LAYER = """  <layer version='3'>
     <name>%(layer)s</name>
     <segtype>segment</segtype>
     <segmentation>none</segmentation>
@@ -158,8 +162,60 @@ CT3 = """<?xml version='1.0' encoding='utf-8'?>
     <special>None</special>
     <scheme>%(scheme)s</scheme>
   </layer>
-</project>
 """
+
+CT3 = """<?xml version='1.0' encoding='utf-8'?>
+<project>
+  <ctversion>5.0</ctversion>
+
+  <mediatype>text</mediatype>
+%(layers)s</project>
+"""
+
+
+def resolve_layers(a):
+    """--layer 名称:方案… > --scheme 单选 > 默认四层；返回 [(层名, 方案文件名)…]"""
+    specs = a.layer or []
+    if specs:
+        out = []
+        for sp in specs:
+            if ':' in sp:
+                nm, key = [x.strip() for x in sp.split(':', 1)]
+                fn = apprlib.scheme_file(key)
+                if not fn:
+                    sys.exit('未知方案 %r（可选: %s）' % (key, ', '.join(apprlib.FAMILY)))
+            else:
+                nm = sp.strip()
+                fn = apprlib.scheme_file(nm)
+                if not fn:
+                    sys.exit('认不出层名 %r（已知层名: %s；也可写 层名:方案）'
+                             % (nm, ', '.join(apprlib.LAYER2SCHEME)))
+            if not nm:
+                sys.exit('层名不能为空：%r' % sp)
+            out.append((nm, fn))
+    elif a.scheme:
+        fn = apprlib.scheme_file(a.scheme)
+        out = [(apprlib.FAMILY[a.scheme][1], fn)]
+    else:
+        out = [(apprlib.FAMILY[k][1], apprlib.FAMILY[k][0])
+               for k in apprlib.DEFAULT_LAYERS]
+    names = [n for n, _ in out]
+    dup = sorted({n for n in names if names.count(n) > 1})
+    if dup:
+        sys.exit('层名重复：%s（同一项目里层名必须唯一）' % '、'.join(dup))
+    return out
+
+
+def write_empty_idx(path, scheme_path):
+    """空 idx：头部 + 特征表 + 0 条记录。UAM 打开即为空层，可直接开始标注。"""
+    sch = apprlib.Scheme(scheme_path)
+    old = list(uamlib.FEATURES)
+    uamlib.set_features(sch.features)
+    try:
+        uamlib.write_idx(path, [])
+    finally:
+        uamlib.set_features(old)
+    return len(sch.features)
 
 
 def main():
@@ -174,10 +230,13 @@ def main():
                     help='--text 时把视觉行（Word 导出的硬折行）还原成段落；一行一段的清洗稿不要加')
     ap.add_argument('--no-title', action='store_true',
                     help='丢掉开头标题/小标题行（新闻标题、编号，不属于正文）')
-    ap.add_argument('--scheme', choices=sorted(SCHEMES), default='transitivity',
-                    help='标注方案：transitivity（及物性，默认）或 appraisal（评价理论）')
+    ap.add_argument('--scheme', choices=list(apprlib.FAMILY),
+                    help='只建一层时用：transitivity / appraisal / attitude / engagement / graduation')
+    ap.add_argument('--layer', action='append', metavar='层名[:方案]',
+                    help='要建的层，可重复；只给层名时方案按名推断。'
+                         '默认四层：及物性 态度 介入 级差')
     a = ap.parse_args()
-    scheme_file, layer = SCHEMES[a.scheme]
+    layers = resolve_layers(a)
 
     if a.doc:
         import doc_to_html
@@ -203,12 +262,19 @@ def main():
     for sub in ['Corpus/Texts', 'Schemes', 'Annotations/Texts/Text-1.txt']:
         os.makedirs(os.path.join(out, sub), exist_ok=True)
     open(os.path.join(out, 'Corpus/Texts/Text-1.txt'), 'w', encoding='utf-8', newline='\n').write(text)
-    shutil.copy2(os.path.join(ASSETS, scheme_file),
-                 os.path.join(out, 'Schemes/%s.xml' % layer))
-    open(os.path.join(out, name + '.ct3'), 'w', encoding='utf-8', newline='\n').write(
-        CT3 % dict(layer=layer, scheme=layer + '.xml'))
     open(os.path.join(out, 'Annotations/Texts/Text-1.txt/Metadata.idx'), 'wb').write(
         b'english\tutf-8\tArial\t14')
+
+    blocks, nfeat = [], []
+    for layer, fn in layers:
+        src = os.path.join(ASSETS, fn)
+        dst = os.path.join(out, 'Schemes', layer + '.xml')
+        shutil.copy2(src, dst)
+        n = write_empty_idx(os.path.join(out, 'Annotations/Texts/Text-1.txt', layer + '.idx'), dst)
+        blocks.append(CT3_LAYER % dict(layer=layer, scheme=layer + '.xml'))
+        nfeat.append((layer, fn, n))
+    open(os.path.join(out, name + '.ct3'), 'w', encoding='utf-8', newline='\n').write(
+        CT3 % dict(layers=''.join(blocks)))
 
     b = split_sentences(text)
     with open(os.path.join(out, 'Annotations/Texts/Text-1.txt/sentence.dat'), 'wb') as f:
@@ -220,7 +286,9 @@ def main():
     print('%-10s 字符 %6d 段 %4d 句 %4d 词 %5d | 裸数字 %d 断词 %d 双空格 %d'
           % (name, len(text), len(paras), len(b), len(text.split()),
              len(nums), len(hy), len(re.findall(r'  ', text))))
-    print('  方案:', a.scheme, '→ Schemes/%s.xml（层名 %s）' % (layer, layer))
+    print('  层 %d 个：%s' % (len(nfeat), ' / '.join('%s(%d 特征)' % (l, n) for l, _, n in nfeat)))
+    for layer, fn, n in nfeat:
+        print('    %-6s ← %-24s → Schemes/%s.xml + %s.idx（空）' % (layer, fn, layer, layer))
     print('  标题:', repr(paras[0][:60]))
     print('  首段:', repr(paras[1][:70]) if len(paras) > 1 else '')
     print('  末段:', repr(paras[-1][-70:]))

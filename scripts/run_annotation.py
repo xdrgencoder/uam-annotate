@@ -28,7 +28,9 @@ def main():
     ap.add_argument('--project', required=True, help='项目目录（含 Corpus/ 与 Annotations/）')
     ap.add_argument('--ann-prefix', help='标注模块前缀，如 c4 → c4_a.py c4_b.py …')
     ap.add_argument('--ann-dir', help='标注模块所在目录（默认项目目录）')
-    ap.add_argument('--write', action='store_true', help='校验通过后写入 及物性.idx')
+    ap.add_argument('--layer', default='及物性',
+                    help='层名（决定 idx 与复核件名，默认 及物性）')
+    ap.add_argument('--write', action='store_true', help='校验通过后写入 <层名>.idx')
     ap.add_argument('--no-export', action='store_true', help='不生成 xlsx/TSV/HTML')
     ap.add_argument('--sent', nargs=2, type=int, metavar=('LO', 'HI'), help='打印句子区间后退出')
     ap.add_argument('--allow-errors', action='store_true', help='有定位错误也继续（仅打印）')
@@ -41,7 +43,8 @@ def main():
     sys.path.insert(0, proj_dir)
     if a.ann_dir:
         sys.path.insert(0, os.path.abspath(a.ann_dir))
-    p = annlib.Proj(proj_dir, out=os.path.abspath(a.out) if a.out else os.getcwd())
+    p = annlib.Proj(proj_dir, out=os.path.abspath(a.out) if a.out else os.getcwd(),
+                    layer=a.layer)
 
     if a.sent:
         lo, hi = a.sent

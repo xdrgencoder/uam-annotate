@@ -6,14 +6,17 @@
 
 ```
 项目名/
-├── 项目名.ct3                              # XML，层定义
-├── Schemes/及物性.xml                       # 标注方案
-├── Corpus/Texts/Text-1.txt                 # 正文（UTF-8）
+├── 项目名.ct3                              # XML，层定义（可含多个 <layer>）
+├── Schemes/<层名>.xml                      # 每层一份标注方案
+├── Corpus/Texts/Text-1.txt                 # 正文（UTF-8），各层共用
 └── Annotations/Texts/Text-1.txt/
     ├── Metadata.idx                        # english\tutf-8\tArial\t14
-    ├── sentence.dat                        # 每句 8 字节
-    └── 及物性.idx                           # 标注记录
+    ├── sentence.dat                        # 每句 8 字节，各层共用
+    └── <层名>.idx                          # 每层一份标注记录
 ```
+
+多层的项目，`.ct3` 里并列多个 `<layer>`，`Schemes/` 与 `Annotations/` 各留一份——层名既是
+`<scheme>` 的文件名，也是 `<层名>.idx` 的文件名，一一对应。
 
 ### `<项目名>.ct3`
 
@@ -21,6 +24,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <project>
   <ctversion>5.0</ctversion>
+
   <mediatype>text</mediatype>
   <layer version='3'>
     <name>及物性</name>
@@ -30,10 +34,17 @@
     <special>None</special>
     <scheme>及物性.xml</scheme>
   </layer>
+  <layer version='3'>
+    <name>态度</name>
+    ...
+    <scheme>态度.xml</scheme>
+  </layer>
 </project>
 ```
 
-`<segmentation>none</segmentation>` 表示不做句内自动切段，全部手工标注——这是本流水线要的。
+`<layer>` 之间没有额外包裹节点，直接并列（本机 UAM 自己写出的双层 `.ct3` 就是这个形状）。
+`<segmentation>none</segmentation>` 表示不做句内自动切段，全部手工标注——这是本流水线要的；
+UAM 自己写的是 `None`，大小写两种都能读。
 
 ### `Metadata.idx`
 

@@ -4,13 +4,29 @@
 
 **规模**：根特征 `appraisal`，31 个系统，75 个特征，50 条 GLOSS，**0 条 REALISATION**（纯手工标注，没有任何自动识别规则，所以不受「自动标注器」影响，也不会被 UAM 重新计算覆盖）。
 
-选它建项目：
+> **三支拆分是更常用的路数**：UAM 另外自带 `UAM-Attitude` / `UAM-Engagment` / `UAM-Graduation`
+> 三份方案，对应包里的 `scheme-attitude.xml`（36 特征 / 13 系统）、`scheme-engagement.xml`
+> （19 / 8）、`scheme-graduation.xml`（22 / 10）。`make_project.py` 默认就建这三层（加上及物性共四层），
+> 各层独立统计。本文其余部分讲**合并版**；三支的取舍、迁移与命令见 `references/multilayer.md`。
+
+选它建项目（单层合并版）：
 
 ```bash
 python scripts/make_project.py --text 语料.txt --out ./项目/评价章 --name 评价章 --scheme appraisal
 ```
 
 产出的层名是 `评价`，方案落 `Schemes/评价.xml`，标注写 `Annotations/Texts/Text-1.txt/评价.idx`。
+
+## 合并版与三支的特征名差异
+
+只有一组名字不同——评价者。合并版放在 `AFFECT-TYPE` 下，拆分版是独立的 `APPRAISER` 系统：
+
+| 合并版（`Appraisal_max`） | 三支（`UAM-Attitude`） |
+|---|---|
+| `authorial-evaluation` | `writer-appraiser` |
+| `non-authorial-evaluation` | `other-appraiser` |
+
+其余 43 个常用特征名两套一致。迁移脚本按这张表映射即可。
 
 ## 与及物性层的三个结构差异
 

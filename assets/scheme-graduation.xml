@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='utf-8'?>
+<NETWORK VERSION='1.1'>
+  <ROOT>
+    <FEATURE>
+      <NAME>graduation</NAME>
+      <STATE>active</STATE>
+    </FEATURE>
+  </ROOT>
+  <SYSTEMS>
+    <SYSTEM>
+      <NAME>GRADUATION-TYPE</NAME>
+      <EC>graduation</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>force</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Stronger or weaker attitude</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>focus</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Exact or vague attitude
+Sharpening or softening of boundaries of:
+- entities (realising graded valeur), and
+- processes (realising graded fulfilment).
+Enable the blurring of categorical meanings
+(of entities or processes), representing them
+as open, fluidor incomplete.</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>FORCE-TYPE</NAME>
+      <EC>force</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>intensification</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Intensifies an attitude (SUCH A fool, EXTREMELY attractive)</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>quantification</NAME>
+          <STATE>active</STATE>
+          <GLOSS>Quantifies the attitude
+- Number: heaps of troubles;
+- Amount: so much distress;
+- Extent: long-lasting hostility</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>INTENSIFICATION-TYPE</NAME>
+      <EC>intensification</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>degree</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>vigour</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>QUANTIFICATION-TYPE</NAME>
+      <EC>quantification</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>number</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>mass</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>extent</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>EXTENT-GATE</NAME>
+      <EC>extent</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>proximity</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>distribution</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>PROXIMITY-TYPE</NAME>
+      <EC>proximity</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>time</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>space</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>DISTRIBUTION-TYPE</NAME>
+      <EC>distribution</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>distrib-time</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>distrib-space</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>SCALE</NAME>
+      <EC>force</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>upscale</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>downscale</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>LEXICAL-FUSION</NAME>
+      <EC>force</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>isolating</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>infusing</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>FOCUS-TYPE</NAME>
+      <EC>focus</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>soften</NAME>
+          <STATE>active</STATE>
+          <GLOSS>E.g. it was sort of nice</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>sharpen</NAME>
+          <STATE>active</STATE>
+          <GLOSS>E.g. it was exactly what I wanted</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+  </SYSTEMS></NETWORK>

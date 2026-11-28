@@ -25,6 +25,29 @@ from collections import Counter, defaultdict, OrderedDict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import uamlib
 
+ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets')
+
+# 方案键 -> (assets 里的模板文件名, 默认层名)。一个项目可以同时挂多套，各层一个 xml + 一个 idx。
+FAMILY = OrderedDict([
+    ('transitivity', ('scheme-transitivity.xml', '及物性')),
+    ('attitude',     ('scheme-attitude.xml',     '态度')),
+    ('engagement',   ('scheme-engagement.xml',   '介入')),
+    ('graduation',   ('scheme-graduation.xml',   '级差')),
+    ('appraisal',    ('scheme-appraisal.xml',    '评价')),
+])
+LAYER2SCHEME = {v[1]: k for k, v in FAMILY.items()}
+#  默认四层：及物性 + 评价理论拆开的三支（态度 / 介入 / 级差）
+DEFAULT_LAYERS = ['transitivity', 'attitude', 'engagement', 'graduation']
+
+
+def scheme_file(key):
+    """方案键（attitude）或层名（态度）→ assets 里的文件名；认不出返回 None"""
+    if key in FAMILY:
+        return FAMILY[key][0]
+    if key in LAYER2SCHEME:
+        return FAMILY[LAYER2SCHEME[key]][0]
+    return None
+
 
 # ---------------------------------------------------------------- 方案解析
 class Scheme:
@@ -130,8 +153,12 @@ class ApprProj:
                        for i in range(len(d) // 8)]
         path = scheme or os.path.join(self.root, 'Schemes', layer + '.xml')
         if not os.path.exists(path):
-            path = os.path.join(os.path.dirname(os.path.dirname(
-                os.path.abspath(__file__))), 'assets', 'scheme-appraisal.xml')
+            fn = scheme_file(layer)
+            if not fn:
+                raise SystemExit('层 %r 既没有 Schemes/%s.xml，也认不出该用哪套方案'
+                                 '（用 --scheme 指定，或把层名改成 %s）'
+                                 % (layer, layer, ' / '.join(LAYER2SCHEME)))
+            path = os.path.join(ASSETS, fn)
         self.scheme = Scheme(path)
         self.scheme_path = path
 
@@ -301,7 +328,7 @@ class ApprProj:
         for col, w in zip('ABCD', [26, 18, 60, 40]):
             ws3.column_dimensions[col].width = w
 
-        p = os.path.join(self.out, name or '%s_评价标注复核表.xlsx' % self.ch)
+        p = os.path.join(self.out, name or '%s_%s标注复核表.xlsx' % (self.ch, self.layer))
         wb.save(p)
         return p
 
@@ -313,7 +340,7 @@ class ApprProj:
                 r['sid'], r['pid'] or '', r['start'], r['end'],
                 '+'.join(r['feats']), r.get('role', ''),
                 self.norm(self.text[r['start']:r['end']])))
-        p = os.path.join(self.out, name or '%s_评价标注明细.tsv' % self.ch)
+        p = os.path.join(self.out, name or '%s_%s标注明细.tsv' % (self.ch, self.layer))
         open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(rows))
         return p
 
@@ -351,7 +378,7 @@ class ApprProj:
             blocks.append('<div class="sent"><span class="sn">S%d</span>%s</div>'
                           % (sno, ''.join(out)))
         H = ["""<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
-<title>%(ch)s 评价标注复核</title><style>
+<title>%(ch)s %(layer)s标注复核</title><style>
 :root{color-scheme:dark}
 body{background:#0d1117;color:#c9d1d9;margin:0;padding:28px 36px 80px;
 font-family:-apple-system,"Segoe UI",system-ui,"Microsoft YaHei",sans-serif;line-height:2.05;font-size:15px}
@@ -366,14 +393,14 @@ td.ec{color:#6e7681;font-family:ui-monospace,Consolas,monospace}
 .sp{background:color-mix(in srgb,var(--c) 14%%,transparent);border-bottom:2px solid var(--c);border-radius:2px;padding:0 1px}
 .lab{font-style:normal;font-size:10px;color:var(--c);font-family:ui-monospace,Consolas,monospace;vertical-align:super;margin-right:2px}
 </style></head><body>
-<h1>%(ch)s · 评价标注复核</h1>
+<h1>%(ch)s · %(layer)s标注复核</h1>
 <div class="meta">%(ns)d 句有标注 · %(n)d 个标注段 · 方案 %(np)d 系统 / %(nf)d 特征</div>
 <div class="panel"><table>%(rows)s</table></div>
-""" % dict(ch=self.ch, ns=len(blocks), n=n, np=len(sch.systems),
+""" % dict(ch=self.ch, layer=self.layer, ns=len(blocks), n=n, np=len(sch.systems),
            nf=len(sch.features) - 1, rows=''.join(rows))]
         H.extend(blocks)
         H.append('</body></html>')
-        p = os.path.join(self.out, name or '%s_评价标注复核.html' % self.ch)
+        p = os.path.join(self.out, name or '%s_%s标注复核.html' % (self.ch, self.layer))
         open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(H))
         return p
 

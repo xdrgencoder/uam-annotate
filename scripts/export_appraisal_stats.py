@@ -129,7 +129,8 @@ def write_xlsx(recs, sch, path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--project', required=True, help='项目目录（含 Annotations/）')
-    ap.add_argument('--layer', default='评价', help='层名（决定 idx 文件名，默认 评价）')
+    ap.add_argument('--layer', default='评价',
+                    help='层名（决定 idx 文件名，默认 评价；多层项目里可给 态度 / 介入 / 级差 / 及物性）')
     ap.add_argument('--scheme', help='方案 xml（默认 <项目>/Schemes/<层名>.xml）')
     ap.add_argument('--out', default='.', help='输出目录（默认当前目录）')
     ap.add_argument('--xlsx', action='store_true', help='同时导出 Excel')
@@ -144,7 +145,11 @@ def main():
         sys.exit('没有 %s，先跑标注脚本落盘' % idx)
     scheme_path = a.scheme or os.path.join(proj, 'Schemes', a.layer + '.xml')
     if not os.path.exists(scheme_path):
-        scheme_path = os.path.join(os.path.dirname(HERE), 'assets', 'scheme-appraisal.xml')
+        fn = apprlib.scheme_file(a.layer)
+        if not fn:
+            sys.exit('找不到 Schemes/%s.xml，也认不出层名 %r（用 --scheme 指定方案）'
+                     % (a.layer, a.layer))
+        scheme_path = os.path.join(apprlib.ASSETS, fn)
     sch = apprlib.Scheme(scheme_path)
 
     recs, ftab = uamlib.read_idx(idx)

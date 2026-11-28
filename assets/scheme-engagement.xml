@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8'?>
+<NETWORK VERSION='1.1'>
+  <ROOT>
+    <FEATURE>
+      <NAME>engagement</NAME>
+      <STATE>active</STATE>
+    </FEATURE>
+  </ROOT>
+  <SYSTEMS>
+    <SYSTEM>
+      <NAME>ENGAGEMENT-TYPE</NAME>
+      <EC>engagement</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>mono-glossic</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>hetero-glossic</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>HETERO-GLOSSIC-TYPE</NAME>
+      <EC>hetero-glossic</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>contract</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>expand</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>CONTRACT-TYPE</NAME>
+      <EC>contract</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>disclaim</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>proclaim</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>DISCLAIM-TYPE</NAME>
+      <EC>disclaim</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>deny</NAME>
+          <STATE>active</STATE>
+          <GLOSS>no, didn&apos;t, never, not, etc | disclaim: deny is a lexicogrammatical feature denying the scoped or framed entity or process, but its discourse semantic effects are multiple and depend on other co-textual signals</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>counter</NAME>
+          <STATE>active</STATE>
+          <GLOSS>counter covers all instances where contrast occurs for discourse semnatic reasons. it is usually signalled by lexical items such as yet, although, but, amazingly, etc, but it can be present through straight comparison-contrast such as via parallelism</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>PROCLAIM-TYPE</NAME>
+      <EC>proclaim</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>concur</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+        <FEATURE>
+          <NAME>pronounce</NAME>
+          <STATE>active</STATE>
+          <GLOSS>I contend, the facts of the matter are, indeed, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>endorse</NAME>
+          <STATE>active</STATE>
+          <GLOSS>the X demonstrates, shows, proves, ....</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>justify</NAME>
+          <STATE>active</STATE>
+          <GLOSS>a proposition is justified when reasons are given. signal words are because, since, the reason for, etc, and flags the proposition as contentious and requiring justification</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>CONCUR-TYPE</NAME>
+      <EC>concur</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>affirm</NAME>
+          <STATE>active</STATE>
+          <GLOSS>naturally, of course, obviously, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>concede</NAME>
+          <STATE>active</STATE>
+          <GLOSS>admittedly, sure..., however, etc</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>EXPAND-TYPE</NAME>
+      <EC>expand</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>entertain</NAME>
+          <STATE>active</STATE>
+          <GLOSS>perhaps, it&apos;s probably that, it seems, may, must, apparently, expository questions....</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>attribute</NAME>
+          <STATE>active</STATE>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+    <SYSTEM>
+      <NAME>ATTRIBUTE-GATE</NAME>
+      <EC>attribute</EC>
+      <FEATURES>
+        <FEATURE>
+          <NAME>acknowledge</NAME>
+          <STATE>active</STATE>
+          <GLOSS>halliday argues that, most people acknowledge that, etc</GLOSS>
+        </FEATURE>
+        <FEATURE>
+          <NAME>distance</NAME>
+          <STATE>active</STATE>
+          <GLOSS>chomsky claimed to have shown that...</GLOSS>
+        </FEATURE>
+      </FEATURES>
+    </SYSTEM>
+
+  </SYSTEMS></NETWORK>

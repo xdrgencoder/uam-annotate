@@ -48,13 +48,13 @@ JS = ('<script>if(typeof showStatsHits==="undefined")'
       '{window.showStatsHits=function(){}};</script>')
 
 
-def stats_html(recs, note, path):
+def stats_html(recs, note, path, layer='及物性'):
     n = len(recs)
     c = Counter(f for x in recs for f in x['feats'])
     o = ["<html><meta charset='utf-8'><style>%s</style>%s</head>" % (CSS, JS),
          "<body style='overflow: scroll; margin: 10px; background-color: white;'>",
          "<p><b>User</b>: $Standalone",
-         "<p><b>Unit of Interest</b>: &lt;及物性 feature=\"clause\"/&gt;",
+         "<p><b>Unit of Interest</b>: &lt;%s feature=\"clause\"/&gt;" % layer,
          "<p><b>Aspect</b>: feature",
          "<p><b>Counting</b>: global"]
     for name, feats in SYSTEMS:
@@ -111,7 +111,7 @@ def write_xlsx(recs, path, ch_spans=None):
         for f in feats:
             ws.cell(row=r, column=2, value=f).font = MONO
             ws.cell(row=r, column=3, value=c[f]).alignment = RIG
-            ws.cell(row=r, column=4, value='%.1f%%' % (100.0 * c[f] / n)).alignment = RIG
+            ws.cell(row=r, column=4, value='%.1f%%' % (100.0 * c[f] / n if n else 0)).alignment = RIG
             for col in range(1, 5):
                 ws.cell(row=r, column=col).border = BOX
             r += 1
@@ -119,7 +119,7 @@ def write_xlsx(recs, path, ch_spans=None):
         ws.cell(row=r, column=2, value='Total').font = Font(bold=True)
         ws.cell(row=r, column=3, value=tot).font = Font(bold=True)
         ws.cell(row=r, column=3).alignment = RIG
-        ws.cell(row=r, column=4, value='%.1f%%' % (100.0 * tot / n)).alignment = RIG
+        ws.cell(row=r, column=4, value='%.1f%%' % (100.0 * tot / n if n else 0)).alignment = RIG
         for col in range(1, 5):
             cc = ws.cell(row=r, column=col)
             cc.border, cc.fill = BOX, T_FILL
@@ -146,7 +146,7 @@ def write_xlsx(recs, path, ch_spans=None):
                          for x in recs).most_common():
         ws.cell(row=r, column=1, value=p_).font = MONO
         ws.cell(row=r, column=2, value=k).alignment = RIG
-        ws.cell(row=r, column=3, value='%.2f%%' % (100.0 * k / n)).alignment = RIG
+        ws.cell(row=r, column=3, value='%.2f%%' % (100.0 * k / n if n else 0)).alignment = RIG
         for col in range(1, 4):
             ws.cell(row=r, column=col).border = BOX
         r += 1
@@ -212,6 +212,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--project', required=True, help='项目目录')
     ap.add_argument('--out', default='.', help='输出目录')
+    ap.add_argument('--layer', default='及物性', help='层名（决定 idx 文件名，默认 及物性）')
     ap.add_argument('--exclude', action='append', default=[],
                     metavar='START:END', help='段起点落在此区间则不计（可重复），用于剔除重复正文')
     ap.add_argument('--suffix', default='', help='输出文件名后缀，如 _dedup')
@@ -223,7 +224,10 @@ def main():
     proj = os.path.abspath(a.project)
     out = os.path.abspath(a.out)
     os.makedirs(out, exist_ok=True)
-    recs, _ = uamlib.read_idx(os.path.join(proj, 'Annotations/Texts/Text-1.txt/及物性.idx'))
+    idx = os.path.join(proj, 'Annotations/Texts/Text-1.txt', a.layer + '.idx')
+    if not os.path.exists(idx):
+        sys.exit('没有 %s，先跑标注脚本落盘' % idx)
+    recs, _ = uamlib.read_idx(idx)
 
     ex = []
     for e in a.exclude:
@@ -236,14 +240,14 @@ def main():
     if ex:
         note += ' · 已剔除 ' + ', '.join('%d–%d' % e for e in ex)
     note += ' · ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    p = stats_html(recs, note, os.path.join(out, 'StatsResult%s.html' % a.suffix))
+    p = stats_html(recs, note, os.path.join(out, 'StatsResult%s.html' % a.suffix), a.layer)
     print('写出', p, '| 段', len(recs))
 
     n = len(recs)
     c = Counter(f for x in recs for f in x['feats'])
     for name, feats in SYSTEMS:
         tot = sum(c[f] for f in feats)
-        print('  %-16s TOTAL %5d  %5.1f%%' % (name, tot, 100.0 * tot / n))
+        print('  %-16s TOTAL %5d  %5.1f%%' % (name, tot, 100.0 * tot / n if n else 0))
 
     if a.xlsx:
         ch_spans = None

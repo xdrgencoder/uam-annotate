@@ -39,12 +39,14 @@ POLICY = [
 
 
 class Proj:
-    def __init__(self, chapter, base=None, out=None):
-        """chapter: 项目目录名（相对 base）或绝对路径；base 默认取环境变量 UAM_BASE 或当前目录"""
+    def __init__(self, chapter, base=None, out=None, layer='及物性'):
+        """chapter: 项目目录名（相对 base）或绝对路径；base 默认取环境变量 UAM_BASE 或当前目录；
+        layer: 层名，决定 idx 文件名与复核件名（一个项目可有多层，各写各的 idx）"""
         base = base or os.environ.get('UAM_BASE') or os.getcwd()
         self.root = chapter if os.path.isabs(chapter) else os.path.join(base, chapter)
         self.ch = os.path.basename(self.root.rstrip('/\\'))
         self.out = out or base
+        self.layer = layer
         os.makedirs(self.out, exist_ok=True)   # 复核件目录不存在时自动建
         self.text = open(os.path.join(self.root, 'Corpus/Texts/Text-1.txt'), encoding='utf-8').read()
         d = open(os.path.join(self.root, 'Annotations/Texts/Text-1.txt/sentence.dat'), 'rb').read()
@@ -118,7 +120,7 @@ class Proj:
 
     # ---------------------------------------------------------------- 写盘与导出
     def idx_path(self):
-        return os.path.join(self.root, 'Annotations/Texts/Text-1.txt/及物性.idx')
+        return os.path.join(self.root, 'Annotations/Texts/Text-1.txt', self.layer + '.idx')
 
     def write(self, recs):
         p = self.idx_path()
@@ -163,7 +165,7 @@ class Proj:
             ws2.append([k, cat, v])
         for col, w in zip('ABC', [22, 14, 10]):
             ws2.column_dimensions[col].width = w
-        p = os.path.join(self.out, name or '%s_标注复核表.xlsx' % self.ch)
+        p = os.path.join(self.out, name or '%s_%s标注复核表.xlsx' % (self.ch, self.layer))
         wb.save(p)
         return p
 
@@ -173,7 +175,7 @@ class Proj:
             rows.append('%d\t%s\t%d\t%d\t%s\t%s' % (
                 r['sid'], r['pid'] or '', r['start'], r['end'],
                 '+'.join(r['feats']), self.norm(self.text[r['start']:r['end']])))
-        p = os.path.join(self.out, name or '%s_标注明细.tsv' % self.ch)
+        p = os.path.join(self.out, name or '%s_%s标注明细.tsv' % (self.ch, self.layer))
         open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(rows))
         return p
 
@@ -227,7 +229,7 @@ class Proj:
         cbars = ' · '.join('%s <b>%d</b>' % (k, v) for k, v in cc.most_common())
         pol = '<br>\n'.join('%d. %s' % (i + 1, x) for i, x in enumerate(POLICY))
         H = ["""<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
-<title>%(ch)s 及物性标注复核</title><style>
+<title>%(ch)s %(layer)s标注复核</title><style>
 :root{color-scheme:dark}
 body{background:#0d1117;color:#c9d1d9;margin:0;padding:28px 36px 80px;
 font-family:-apple-system,"Segoe UI",system-ui,"Microsoft YaHei",sans-serif;line-height:2.05;font-size:15px}
@@ -242,7 +244,7 @@ h1{font-size:19px;margin:0 0 4px;color:#e6edf3;font-weight:600}
 .lab{font-style:normal;font-size:10px;color:var(--c);font-family:ui-monospace,Consolas,monospace;vertical-align:super;margin-right:2px}
 .cl>.lab{font-weight:700}
 </style></head><body>
-<h1>%(ch)s · 及物性标注复核</h1>
+<h1>%(ch)s · %(layer)s标注复核</h1>
 <div class="meta">%(ns)d 句 · %(ncl)d 个小句 · %(nseg)d 个标注段</div>
 <div class="panel">过程类型：%(bars)s</div>
 <div class="panel"><div>参与者角色：%(rbars)s</div>
@@ -251,12 +253,12 @@ h1{font-size:19px;margin:0 0 4px;color:#e6edf3;font-weight:600}
 %(pol)s
 <br>
 </div>
-""" % dict(ch=self.ch, ns=len(blocks), ncl=ncl, nseg=len(recs), bars=bars,
+""" % dict(ch=self.ch, layer=self.layer, ns=len(blocks), ncl=ncl, nseg=len(recs), bars=bars,
            rbars=rbars, cbars=cbars, pol=pol)]
         for sno, body in blocks:
             H.append('<div class="sent"><span class="sn">S%d</span>%s</div>' % (sno, body))
         H.append('</body></html>')
-        p = os.path.join(self.out, name or '%s_标注复核.html' % self.ch)
+        p = os.path.join(self.out, name or '%s_%s标注复核.html' % (self.ch, self.layer))
         open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(H))
         return p
 
